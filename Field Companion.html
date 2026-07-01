@@ -716,6 +716,14 @@ const DEFAULT_MAP_TEMPLATE = {
 let content = deepClone(DEFAULT_SETTING_TEMPLATE);
 let mapTemplateActive = deepClone(DEFAULT_MAP_TEMPLATE);
 
+/* Shared UI reset strings — single source of truth used by renderAll() */
+const EMPTY_HEX_DETAIL   = '<span class="empty-state">Click any hex to inspect it. Hexes adjacent to your marker (the brass star) — or already explored — will offer a move/travel button.</span>';
+const EMPTY_EVENT_RESULT = '<div class="empty-state">Generate an event to see what the road brings. Any complications that have built up will surface here too.</div>';
+
+/* Tracks which hex is currently shown in the detail panel so
+   delegated hex-detail handlers don't need a closure. */
+let currentDetailHex = null;
+
 function deepClone(obj){ return JSON.parse(JSON.stringify(obj)); }
 
 /* =========================================================
@@ -928,17 +936,18 @@ function travelToHex(hex, distance){
 }
 
 function showHexDetail(hex){
+  currentDetailHex = hex;  // delegated handler reads this instead of a closure
   const el = document.getElementById('hexDetail');
   const distance = cubeDistance(state.current.q, state.current.r, hex.q, hex.r);
   const isCurrent = distance === 0;
   const isAdjacent = distance === 1;
-  const canTravel = distance > 1 && hex.explored;
+  const canTravel  = distance > 1 && hex.explored;
 
   let actionBtn = '';
   if(isAdjacent){
-    actionBtn = `<button class="btn primary small" id="btnMoveHere" style="margin-top:10px;">${hex.explored ? 'Move Here' : 'Move Here &amp; Reveal'}</button>`;
+    actionBtn = `<button class="btn primary small" data-action="hex-move" style="margin-top:10px;">${hex.explored ? 'Move Here' : 'Move Here &amp; Reveal'}</button>`;
   } else if(canTravel){
-    actionBtn = `<button class="btn primary small" id="btnMoveHere" style="margin-top:10px;">Travel Here (${distance} hexes)</button>`;
+    actionBtn = `<button class="btn primary small" data-action="hex-move" style="margin-top:10px;">Travel Here (${distance} hexes)</button>`;
   }
 
   if(!hex.explored){
@@ -948,19 +957,18 @@ function showHexDetail(hex){
       <div class="hd-empty" style="margin-top:8px;">Nothing is known about this area yet.${isAdjacent ? '' : ' Move adjacent to it, hex by hex, to find out.'}</div>
       ${actionBtn}
     `;
-    if(isAdjacent) document.getElementById('btnMoveHere').onclick = ()=> travelToHex(hex, distance);
     return;
   }
 
   const terrainLabel = (content.terrain[hex.terrain] && content.terrain[hex.terrain].label) || hex.terrain;
-  const npcsHere = state.npcs.filter(n => n.locationHexId === hex.id);
+  const npcsHere   = state.npcs.filter(n => n.locationHexId === hex.id);
   const questsHere = state.quests.filter(q => q.locationHexId === hex.id);
   el.innerHTML = `
     <div class="hd-title">${escapeHtml(hex.name)}${isCurrent ? ' <span class="pill active" style="margin-left:6px;">here</span>' : ''}</div>
     <div class="hd-meta">Hex ${hex.q},${hex.r} \u00b7 ${escapeHtml(terrainLabel)}${hex.q===0&&hex.r===0?' \u00b7 Starting Settlement':''}</div>
     <div class="hd-rename">
       <input type="text" id="hexRenameInput" value="${escapeHtml(hex.name)}">
-      <button class="btn ghost small" id="btnRenameHex">Rename</button>
+      <button class="btn ghost small" data-action="hex-rename">Rename</button>
     </div>
     ${actionBtn}
     <div class="hd-section">
@@ -976,11 +984,6 @@ function showHexDetail(hex){
         : '<div class="hd-empty">Nothing tracked here yet.</div>'}
     </div>
   `;
-  document.getElementById('btnRenameHex').onclick = ()=>{
-    const val = document.getElementById('hexRenameInput').value.trim();
-    if(val){ hex.name = val; renderMap(); showHexDetail(hex); }
-  };
-  if(isAdjacent || canTravel) document.getElementById('btnMoveHere').onclick = ()=> travelToHex(hex, distance);
 }
 
 /* =========================================================
@@ -1143,6 +1146,7 @@ function hexSelectOptions(selectedId){
 function renderDraft(){
   const el = document.getElementById('npcDraft');
   if(!draftNpc){ el.innerHTML=''; return; }
+  /* Buttons use data-action; the delegated listener on #npcDraft handles them. */
   el.innerHTML = `
     <div class="card">
       <div class="card-head">
@@ -1174,22 +1178,12 @@ function renderDraft(){
         <input type="file" id="draftImage" accept="image/*">
       </div>
       <div class="card-actions">
-        <button class="btn primary small" id="btnSaveNpc">Save to Roster</button>
-        <button class="btn ghost small" id="btnRerollNpc">Reroll</button>
-        <button class="btn ghost small" id="btnDiscardNpc">Discard</button>
+        <button class="btn primary small" data-action="npc-save-draft">Save to Roster</button>
+        <button class="btn ghost small"   data-action="npc-reroll">Reroll</button>
+        <button class="btn ghost small"   data-action="npc-discard">Discard</button>
       </div>
     </div>
   `;
-  document.getElementById('btnSaveNpc').onclick = saveDraftNpc;
-  document.getElementById('btnRerollNpc').onclick = rollNpc;
-  document.getElementById('btnDiscardNpc').onclick = ()=>{ draftNpc=null; renderDraft(); };
-  document.getElementById('draftImage').addEventListener('change', (e)=>{
-    const file = e.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = ()=>{ draftNpc.imageRef = { type:'embedded', value: reader.result }; };
-    reader.readAsDataURL(file);
-  });
 }
 
 function saveDraftNpc(){
@@ -1212,36 +1206,9 @@ function renderRoster(){
     el.innerHTML = '<div class="empty-state">No one\'s been recorded yet. Generate an NPC, then save them to the roster.</div>';
     return;
   }
+  /* Pure markup render — all interaction handled by the delegated
+     click/change listeners registered once on #npcRoster / #tab-npcs. */
   el.innerHTML = state.npcs.map(n => n.id === editingNpcId ? npcEditMarkup(n) : npcCardMarkup(n)).join('');
-
-  el.querySelectorAll('[data-remove]').forEach(btn=>{
-    btn.onclick = ()=>{
-      state.npcs = state.npcs.filter(n=>n.id!==btn.dataset.remove);
-      renderRoster();
-    };
-  });
-  el.querySelectorAll('[data-edit]').forEach(btn=>{
-    btn.onclick = ()=>{ editingNpcId = btn.dataset.edit; renderRoster(); };
-  });
-  const saveBtn = el.querySelector('[data-save-edit]');
-  if(saveBtn){
-    saveBtn.onclick = ()=> saveEditNpc(saveBtn.dataset.saveEdit);
-    const imgInput = el.querySelector('#editImage');
-    if(imgInput){
-      imgInput.addEventListener('change', (e)=>{
-        const file = e.target.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = ()=>{
-          const n = state.npcs.find(x=>x.id===saveBtn.dataset.saveEdit);
-          n.imageRef = { type:'embedded', value: reader.result };
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-  }
-  const cancelBtn = el.querySelector('[data-cancel-edit]');
-  if(cancelBtn) cancelBtn.onclick = ()=>{ editingNpcId = null; renderRoster(); };
 }
 
 function npcLocationName(n){
@@ -1264,8 +1231,8 @@ function npcCardMarkup(n){
           </div>
         </div>
         <div class="card-actions" style="margin-top:0;">
-          <button class="btn ghost small" data-edit="${n.id}">Edit</button>
-          <button class="btn ghost small" data-remove="${n.id}">Remove</button>
+          <button class="btn ghost small" data-action="npc-edit"   data-npc-id="${n.id}">Edit</button>
+          <button class="btn ghost small" data-action="npc-remove" data-npc-id="${n.id}">Remove</button>
         </div>
       </div>
       ${n.tags && n.tags.length ? `<div style="margin-top:7px;">${n.tags.map(t=>`<span class="pill" style="margin-right:4px;">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
@@ -1312,8 +1279,8 @@ function npcEditMarkup(n){
         <input type="file" id="editImage" accept="image/*">
       </div>
       <div class="card-actions">
-        <button class="btn primary small" data-save-edit="${n.id}">Save Changes</button>
-        <button class="btn ghost small" data-cancel-edit="${n.id}">Cancel</button>
+        <button class="btn primary small" data-action="npc-save-edit"   data-npc-id="${n.id}">Save Changes</button>
+        <button class="btn ghost small"   data-action="npc-cancel-edit" data-npc-id="${n.id}">Cancel</button>
       </div>
     </div>
   `;
@@ -1385,6 +1352,7 @@ function renderQuests(){
     el.innerHTML = '<div class="empty-state">No quests yet. Generate a hook to get started.</div>';
     return;
   }
+  /* Pure markup — delegated listener on #questList handles all clicks. */
   el.innerHTML = state.quests.map(q=>`
     <div class="card">
       <div class="card-head">
@@ -1396,26 +1364,13 @@ function renderQuests(){
       </div>
       <div class="card-body">${escapeHtml(q.hook)}</div>
       <div class="card-actions">
-        ${q.status!=='active' ? `<button class="btn ghost small" data-act="active" data-id="${q.id}">Mark Active</button>` : ''}
-        ${q.status!=='done' ? `<button class="btn ghost small" data-act="done" data-id="${q.id}">Mark Complete</button>` : ''}
-        ${q.status!=='failed' ? `<button class="btn ghost small" data-act="failed" data-id="${q.id}">Mark Failed</button>` : ''}
-        <button class="btn ghost small" data-remove="${q.id}">Remove</button>
+        ${q.status!=='active' ? `<button class="btn ghost small" data-action="quest-status" data-quest-id="${q.id}" data-status="active">Mark Active</button>` : ''}
+        ${q.status!=='done'   ? `<button class="btn ghost small" data-action="quest-status" data-quest-id="${q.id}" data-status="done">Mark Complete</button>` : ''}
+        ${q.status!=='failed' ? `<button class="btn ghost small" data-action="quest-status" data-quest-id="${q.id}" data-status="failed">Mark Failed</button>` : ''}
+        <button class="btn ghost small" data-action="quest-remove" data-quest-id="${q.id}">Remove</button>
       </div>
     </div>
   `).join('');
-  el.querySelectorAll('[data-act]').forEach(btn=>{
-    btn.onclick = ()=>{
-      const q = state.quests.find(q=>q.id===btn.dataset.id);
-      q.status = btn.dataset.act;
-      renderQuests();
-    };
-  });
-  el.querySelectorAll('[data-remove]').forEach(btn=>{
-    btn.onclick = ()=>{
-      state.quests = state.quests.filter(q=>q.id!==btn.dataset.remove);
-      renderQuests();
-    };
-  });
 }
 
 /* =========================================================
@@ -1693,21 +1648,9 @@ document.getElementById('btnStartNewGame').onclick = ()=>{
     mapTemplateVersion: mapTpl.mapTemplateVersion || 1
   };
 
-  document.getElementById('activeSettingLabel').textContent = (content.meta && content.meta.name) || 'Untitled Setting';
-  document.getElementById('mapTitle').textContent = (content.meta && content.meta.name) || 'Map';
   document.getElementById('newGameDialog').close();
   hideError();
-
-  renderMap();
-  renderTension();
-  renderPending();
-  renderLog();
-  renderRoster();
-  renderQuests();
-  document.getElementById('freqLabel').textContent = freqLabelFor(state.step);
-  document.getElementById('freqSlider').value = state.step;
-  document.getElementById('hexDetail').innerHTML = '<span class="empty-state">Click any hex to inspect it. Hexes adjacent to your marker (the brass star) — or already explored — will offer a move/travel button.</span>';
-  document.getElementById('eventResult').innerHTML = '<div class="empty-state">Generate an event to see what the road brings. Any complications that have built up will surface here too.</div>';
+  renderAll(true);
 };
 
 /* =========================================================
@@ -1743,19 +1686,7 @@ document.getElementById('fileLoadGame').addEventListener('change', async (e)=>{
   state.log = (data.eventLog || []).map(e => ({ tag:e.tag, text:e.text, t: e.timestamp ? Date.parse(e.timestamp) : Date.now() }));
   state.provenance = data.provenance || state.provenance;
 
-  document.getElementById('activeSettingLabel').textContent = (content.meta && content.meta.name) || 'Loaded Setting';
-  document.getElementById('mapTitle').textContent = (content.meta && content.meta.name) || 'Map';
-
-  renderMap();
-  renderTension();
-  renderPending();
-  renderLog();
-  renderRoster();
-  renderQuests();
-  document.getElementById('freqLabel').textContent = freqLabelFor(state.step);
-  document.getElementById('freqSlider').value = state.step;
-  document.getElementById('hexDetail').innerHTML = '<span class="empty-state">Click any hex to inspect it. Hexes adjacent to your marker (the brass star) — or already explored — will offer a move/travel button.</span>';
-  document.getElementById('eventResult').innerHTML = '<div class="empty-state">Generate an event to see what the road brings. Any complications that have built up will surface here too.</div>';
+  renderAll(true);
 });
 
 /* =========================================================
@@ -1793,13 +1724,38 @@ document.getElementById('btnSaveGame').onclick = ()=>{
 };
 
 /* =========================================================
-   DEBUG MAP TOOLS
+   UNIFIED RENDER
+   Call renderAll(true) for full resets (new game, load game,
+   init). Individual operations call only what they affect.
    ========================================================= */
-document.getElementById('btnRevealAll').onclick = ()=>{
-  for(const h of state.hexes.values()){
-    h.explored = true;
-    if(!h.name) h.name = nameForHex(h);
+function renderAll(resetUI = false){
+  if(resetUI){
+    currentDetailHex = null;
+    document.getElementById('hexDetail').innerHTML   = EMPTY_HEX_DETAIL;
+    document.getElementById('eventResult').innerHTML = EMPTY_EVENT_RESULT;
+    const settingName = (content.meta && content.meta.name) || 'Untitled Setting';
+    document.getElementById('activeSettingLabel').textContent = settingName;
+    document.getElementById('mapTitle').textContent           = settingName;
+    document.getElementById('freqSlider').value = state.step;
+    document.getElementById('freqLabel').textContent = freqLabelFor(state.step);
   }
+  renderMap();
+  renderTension();
+  renderPending();
+  renderLog();
+  renderDraft();
+  renderRoster();
+  renderQuests();
+}
+
+/* =========================================================
+   STATIC BUTTON WIRING
+   These elements are permanent — direct assignment is fine.
+   ========================================================= */
+
+// Debug map tools
+document.getElementById('btnRevealAll').onclick = ()=>{
+  for(const h of state.hexes.values()){ h.explored = true; if(!h.name) h.name = nameForHex(h); }
   renderMap();
 };
 document.getElementById('btnResetFog').onclick = ()=>{
@@ -1812,43 +1768,107 @@ document.getElementById('btnResetFog').onclick = ()=>{
   renderMap();
 };
 
-/* =========================================================
-   TENSION / EVENT / NPC / QUEST WIRING
-   ========================================================= */
-document.getElementById('freqSlider').addEventListener('input', (e)=>{
-  state.step = parseInt(e.target.value,10);
+// Tension
+document.getElementById('freqSlider').addEventListener('input', e=>{
+  state.step = parseInt(e.target.value, 10);
   document.getElementById('freqLabel').textContent = freqLabelFor(state.step);
 });
-document.getElementById('btnCheckTension').onclick = ()=> checkTension('manual check');
-document.getElementById('btnResetTension').onclick = ()=>{ state.tension = tensionDefaults().bleedTo; renderTension(); };
+document.getElementById('btnCheckTension').onclick  = ()=> checkTension('manual check');
+document.getElementById('btnResetTension').onclick  = ()=>{ state.tension = tensionDefaults().bleedTo; renderTension(); };
 
+// Event / NPC / Quest generators
 document.getElementById('btnGenerateEvent').onclick = generateEvent;
-document.getElementById('btnGenNpc').onclick = rollNpc;
-document.getElementById('btnGenQuest').onclick = rollQuest;
+document.getElementById('btnGenNpc').onclick         = rollNpc;
+document.getElementById('btnGenQuest').onclick       = rollQuest;
 
 /* =========================================================
-   TABS
+   EVENT DELEGATION — dynamic content zones
+   Five permanent containers; handlers are registered once.
    ========================================================= */
-document.querySelectorAll('.tab-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
-  });
+
+// 1. Hex detail panel
+document.getElementById('hexDetail').addEventListener('click', e=>{
+  const btn = e.target.closest('[data-action]');
+  if(!btn || !currentDetailHex) return;
+  if(btn.dataset.action === 'hex-rename'){
+    const val = document.getElementById('hexRenameInput')?.value.trim();
+    if(val){ currentDetailHex.name = val; renderMap(); showHexDetail(currentDetailHex); }
+  } else if(btn.dataset.action === 'hex-move'){
+    const dist = cubeDistance(state.current.q, state.current.r, currentDetailHex.q, currentDetailHex.r);
+    travelToHex(currentDetailHex, dist);
+  }
+});
+
+// 2. NPC draft card
+document.getElementById('npcDraft').addEventListener('click', e=>{
+  const btn = e.target.closest('[data-action]');
+  if(!btn) return;
+  if(btn.dataset.action === 'npc-save-draft')  saveDraftNpc();
+  else if(btn.dataset.action === 'npc-reroll') rollNpc();
+  else if(btn.dataset.action === 'npc-discard'){ draftNpc = null; renderDraft(); }
+});
+
+// 3. NPC roster cards
+document.getElementById('npcRoster').addEventListener('click', e=>{
+  const btn = e.target.closest('[data-action]');
+  if(!btn) return;
+  const { action } = btn.dataset;
+  const npcId = btn.dataset.npcId;
+  if(action === 'npc-edit')          { editingNpcId = npcId; renderRoster(); }
+  else if(action === 'npc-remove')   { state.npcs = state.npcs.filter(n=>n.id!==npcId); renderRoster(); }
+  else if(action === 'npc-save-edit')  { saveEditNpc(npcId); }
+  else if(action === 'npc-cancel-edit'){ editingNpcId = null; renderRoster(); }
+});
+
+// 4. Image file uploads (change bubbles, so one listener covers both
+//    #draftImage and #editImage regardless of which is in the DOM)
+document.getElementById('tab-npcs').addEventListener('change', e=>{
+  const input = e.target;
+  if(input.type !== 'file' || !input.files[0]) return;
+  const file = input.files[0];
+  const reader = new FileReader();
+  if(input.id === 'draftImage'){
+    reader.onload = ()=>{ if(draftNpc) draftNpc.imageRef = { type:'embedded', value:reader.result }; };
+  } else if(input.id === 'editImage'){
+    reader.onload = ()=>{
+      const n = state.npcs.find(x=>x.id===editingNpcId);
+      if(n) n.imageRef = { type:'embedded', value:reader.result };
+    };
+  }
+  reader.readAsDataURL(file);
+});
+
+// 5. Quest list cards
+document.getElementById('questList').addEventListener('click', e=>{
+  const btn = e.target.closest('[data-action]');
+  if(!btn) return;
+  const { action } = btn.dataset;
+  const questId = btn.dataset.questId;
+  if(action === 'quest-status'){
+    const q = state.quests.find(q=>q.id===questId);
+    if(q) q.status = btn.dataset.status;
+    renderQuests();
+  } else if(action === 'quest-remove'){
+    state.quests = state.quests.filter(q=>q.id!==questId);
+    renderQuests();
+  }
+});
+
+// 6. Tab switching
+document.querySelector('.tabs').addEventListener('click', e=>{
+  const btn = e.target.closest('.tab-btn');
+  if(!btn) return;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
 });
 
 /* =========================================================
-   INIT — boot straight into the default setting/map
+   INIT
    ========================================================= */
 applyMapTemplate(deepClone(DEFAULT_MAP_TEMPLATE));
-renderMap();
-renderTension();
-renderPending();
-renderLog();
-renderRoster();
-renderQuests();
-document.getElementById('freqLabel').textContent = freqLabelFor(state.step);
+renderAll(true);
 </script>
 </body>
 </html>
