@@ -1,0 +1,96 @@
+{
+  "templateId": "hollow-reach",
+  "templateVersion": 1,
+  "schemaVersion": 1,
+  "meta": {
+    "name": "The Hollow Reach",
+    "genre": "low-fantasy",
+    "author": "built-in",
+    "description": "A damp, half-forgotten borderland."
+  },
+  "terrain": {
+    "plains": { "label": "Plains", "color": "#cfc596", "weight": 24 },
+    "forest": { "label": "Forest", "color": "#5b6b47", "weight": 22 },
+    "hills": { "label": "Hills", "color": "#b89a64", "weight": 15 },
+    "mountains": { "label": "Mountains", "color": "#7a6e63", "weight": 10 },
+    "water": { "label": "Water", "color": "#3f6363", "weight": 11 },
+    "swamp": { "label": "Swamp", "color": "#6a6b47", "weight": 8 },
+    "ruins": { "label": "Ruins", "color": "#9c8b6b", "weight": 6 },
+    "settlement": { "label": "Settlement", "color": "#a8763e", "weight": 4 }
+  },
+  "namePools": {
+    "npcFirstNames": ["Brennic", "Sera", "Oddvan", "Maelis", "Thurn", "Yseult", "Corrin", "Davna", "Petrik", "Ilsabet", "Garrow", "Niamhe", "Aldous", "Wrenna", "Tobin", "Cael", "Hessa", "Drosten"],
+    "npcSurnames": ["Ashford", "Quillwright", "Northgale", "Hollowmere", "Brackwater", "Stonefell", "Larkspur", "Greycombe", "Saltmarrow", "Ferrowind", "Duskbane", "Ironcopse"],
+    "professions": ["hedge healer", "ferryman", "tax assessor", "retired soldier", "relic dealer", "trapper", "bell-ringer", "grave warden", "cartographer", "smuggler", "innkeep", "itinerant scribe", "beekeeper", "road warden"],
+    "traits": ["counts everything under their breath", "never removes their gloves", "owes a debt they won’t name", "speaks of a sibling no one else has met", "collects small bones", "always knows which way is north", "flinches at the sound of bells", "keeps a second name for strangers"],
+    "settlementNames": ["Greywick", "Tarnhollow", "Fenbridge", "Ashmere", "Corvale", "Sallowfield", "Brackenford", "Mirewatch"],
+    "ruinNames": ["the Sunken Hall", "the Broken Choir", "the Fallen Watch", "the Cracked Vault", "the Quiet Tower", "the Drowned Court"]
+  },
+  "questTemplates": {
+    "verbs": ["retrieve", "destroy", "deliver", "protect", "expose the truth behind", "find a buyer for", "smuggle out", "make peace over"],
+    "items": ["a sealed ledger", "the Last King’s signet", "a sunken bell", "an heirloom blade", "a vial of grey salt", "a child’s letter, undelivered", "a map with one corner burned", "a debt marker in an old script"]
+  },
+  "complications": [
+    "A resource you depend on turns out to be insufficient.",
+    "Someone here recognizes you — for better or worse.",
+    "The way forward is blocked; another route must be found.",
+    "Something you left behind is no longer where you put it.",
+    "An old conflict resurfaces at the worst possible time.",
+    "You are being watched, and not by who you’d expect.",
+    "A piece of information you trusted turns out to be wrong.",
+    "Help arrives — but it comes with a price.",
+    "Weather, terrain, or time itself works against you.",
+    "A third party wants the same thing you do.",
+    "Your presence here has consequences you didn’t plan for.",
+    "A tool, weapon, or resource fails when you need it most.",
+    "A stranger offers exactly what you need — and that’s suspicious.",
+    "Something here is not what it first appeared to be.",
+    "You find evidence of someone who passed through before you.",
+    "The quiet breaks: something nearby reacts to your presence.",
+    "An ally’s priorities turn out to differ from yours.",
+    "A debt, oath, or promise comes due.",
+    "The path splits, and the choice costs you something either way.",
+    "A clue points somewhere you did not expect to go."
+  ],
+  "encounterTables": {
+    "generic": [
+      { "tag": "Quiet", "text": "The way is empty. Whatever happens here, you’ll have to bring it yourself." },
+      { "tag": "Discovery", "text": "You spot signs of recent passage — footprints, a cold fire, a dropped item." },
+      { "tag": "Traveler", "text": "A figure approaches from a distance, alone." },
+      { "tag": "Resource", "text": "Something useful presents itself, if you’re willing to take the time." }
+    ],
+    "plains": [
+      { "tag": "Traveler", "text": "A trade caravan crosses your path, dust rising behind it." },
+      { "tag": "Sign", "text": "Crows circle something low in the grass ahead." }
+    ],
+    "forest": [
+      { "tag": "Sign", "text": "The canopy thins where something large has passed through recently." },
+      { "tag": "Hazard", "text": "The undergrowth conceals uneven, treacherous ground." }
+    ],
+    "hills": [
+      { "tag": "Discovery", "text": "An old cairn marks this rise — someone wanted this place remembered." },
+      { "tag": "Sign", "text": "The wind carries a sound that doesn’t belong out here." }
+    ],
+    "mountains": [
+      { "tag": "Hazard", "text": "Loose scree threatens the footing on the climb ahead." },
+      { "tag": "Discovery", "text": "A sheltered overhang shows signs of recent use." }
+    ],
+    "water": [
+      { "tag": "Sign", "text": "Something moves just beneath the surface." },
+      { "tag": "Resource", "text": "The water here runs clear and cold — worth filling your stores." }
+    ],
+    "swamp": [
+      { "tag": "Hazard", "text": "The ground gives more than it should underfoot." },
+      { "tag": "Sign", "text": "A faint, sourceless light flickers between the reeds." }
+    ],
+    "ruins": [
+      { "tag": "Discovery", "text": "Old stonework still bears marks worth puzzling over." },
+      { "tag": "Hazard", "text": "Part of the structure looks ready to give way." }
+    ],
+    "settlement": [
+      { "tag": "Traveler", "text": "Locals eye you with the particular curiosity reserved for outsiders." },
+      { "tag": "Discovery", "text": "Word of something — a rumor, a job, a warning — reaches you quickly here." }
+    ]
+  },
+  "tensionDefaults": { "startingValue": 12, "step": 12, "bleedTo": 8, "ceiling": 95 }
+}

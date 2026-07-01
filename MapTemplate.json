@@ -1,0 +1,13 @@
+{
+  "mapTemplateId": "hollow-reach-default",
+  "mapTemplateVersion": 1,
+  "schemaVersion": 1,
+  "settingTemplateId": "hollow-reach",
+  "mode": "generated",
+  "shape": "hex-radius",
+  "radius": 4,
+  "hexSize": 30,
+  "centerHex": { "terrain": "settlement", "name": "Hollow's Watch", "explored": true },
+  "seed": null,
+  "authoredHexes": []
+}
