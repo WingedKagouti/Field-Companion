@@ -8,427 +8,159 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Spectral:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#241f1a;
-    --ink-soft:#41382c;
-    --parchment:#e9ddc0;
-    --parchment-deep:#ddcda3;
-    --parchment-panel:#f1e7cd;
-    --hatch:#cdba8a;
-    --brass:#a8763e;
-    --brass-deep:#7d5527;
-    --rust:#9c3b2e;
-    --moss:#5b6b47;
-    --teal:#3f6363;
-    --gold:#c9973f;
+    --ink:#241f1a; --ink-soft:#41382c;
+    --parchment:#e9ddc0; --parchment-deep:#ddcda3; --parchment-panel:#f1e7cd;
+    --brass:#a8763e; --brass-deep:#7d5527;
+    --rust:#9c3b2e; --moss:#5b6b47; --teal:#3f6363;
     --line:#bba874;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    background:
-      radial-gradient(ellipse at top left, #f3e8ca 0%, transparent 55%),
-      radial-gradient(ellipse at bottom right, #e2d2a6 0%, transparent 55%),
-      var(--parchment);
-    color:var(--ink);
-    font-family:'Spectral', serif;
-    min-height:100vh;
+    background:radial-gradient(ellipse at top left,#f3e8ca 0%,transparent 55%),
+               radial-gradient(ellipse at bottom right,#e2d2a6 0%,transparent 55%),
+               var(--parchment);
+    color:var(--ink); font-family:'Spectral',serif; min-height:100vh;
   }
-  .app{
-    max-width:1280px;
-    margin:0 auto;
-    padding:28px 24px 60px;
-  }
+  .app{max-width:1280px;margin:0 auto;padding:28px 24px 60px;}
 
-  /* ---------- Header ---------- */
-  header.app-header{
-    display:flex;
-    align-items:flex-end;
-    justify-content:space-between;
-    flex-wrap:wrap;
-    gap:14px;
-    border-bottom:2px solid var(--ink);
-    padding-bottom:14px;
-    margin-bottom:22px;
-  }
-  .title-block h1{
-    font-family:'Fraunces', serif;
-    font-weight:700;
-    font-size:clamp(28px, 4vw, 42px);
-    margin:0 0 2px;
-    letter-spacing:0.01em;
-  }
-  .title-block .sub{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:11.5px;
-    letter-spacing:0.14em;
-    text-transform:uppercase;
-    color:var(--brass-deep);
-  }
-  .header-right{ display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
-  .header-actions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
-  .setting-chip{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12px;
-    border:1px solid var(--ink);
-    background:var(--parchment-panel);
-    padding:7px 12px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    color:var(--ink-soft);
-  }
-  .setting-chip b{ color:var(--ink); font-weight:600; }
+  /* Header */
+  header.app-header{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:22px;}
+  .title-block h1{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(28px,4vw,42px);margin:0 0 2px;letter-spacing:.01em;}
+  .title-block .sub{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass-deep);}
+  .header-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+  .header-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+  .setting-chip{font-family:'IBM Plex Mono',monospace;font-size:12px;border:1px solid var(--ink);background:var(--parchment-panel);padding:7px 12px;display:flex;align-items:center;gap:8px;color:var(--ink-soft);}
+  .setting-chip b{color:var(--ink);font-weight:600;}
 
-  /* ---------- Layout ---------- */
-  .layout{
-    display:grid;
-    grid-template-columns: 1.25fr 1fr;
-    gap:22px;
-    align-items:start;
-  }
-  @media (max-width: 900px){
-    .layout{ grid-template-columns: 1fr; }
-  }
+  /* Layout */
+  .layout{display:grid;grid-template-columns:1.25fr 1fr;gap:22px;align-items:start;}
+  @media(max-width:900px){.layout{grid-template-columns:1fr;}}
+  .panel{background:var(--parchment-panel);border:1px solid var(--ink);box-shadow:3px 3px 0 rgba(36,31,26,.12);}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 16px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--parchment-panel),var(--parchment-deep));}
+  .panel-head h2{font-family:'Fraunces',serif;font-size:16px;font-weight:600;margin:0;letter-spacing:.01em;}
+  .panel-head .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--brass-deep);}
+  .panel-body{padding:16px;}
 
-  .panel{
-    background:var(--parchment-panel);
-    border:1px solid var(--ink);
-    box-shadow: 3px 3px 0 rgba(36,31,26,0.12);
-  }
-  .panel-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    padding:11px 16px;
-    border-bottom:1px solid var(--line);
-    background:linear-gradient(180deg, var(--parchment-panel), var(--parchment-deep));
-  }
-  .panel-head h2{
-    font-family:'Fraunces', serif;
-    font-size:16px;
-    font-weight:600;
-    margin:0;
-    letter-spacing:0.01em;
-  }
-  .panel-head .eyebrow{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:10px;
-    letter-spacing:0.12em;
-    text-transform:uppercase;
-    color:var(--brass-deep);
-  }
-  .panel-body{ padding:16px; }
+  /* Buttons */
+  .btn{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--ink);background:var(--parchment);color:var(--ink);padding:8px 13px;cursor:pointer;transition:transform .08s ease,box-shadow .08s ease;}
+  .btn:hover{box-shadow:2px 2px 0 var(--ink);transform:translate(-1px,-1px);}
+  .btn:active{box-shadow:none;transform:translate(0,0);}
+  .btn.primary{background:var(--ink);color:var(--parchment);}
+  .btn.ghost{background:transparent;}
+  .btn.small{padding:5px 9px;font-size:10.5px;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;transform:none;}
 
-  /* ---------- Map panel ---------- */
-  .map-toolbar{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    align-items:center;
-    margin-bottom:12px;
-  }
-  .btn{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:11.5px;
-    letter-spacing:0.04em;
-    text-transform:uppercase;
-    border:1px solid var(--ink);
-    background:var(--parchment);
-    color:var(--ink);
-    padding:8px 13px;
-    cursor:pointer;
-    transition:transform .08s ease, box-shadow .08s ease;
-  }
-  .btn:hover{ box-shadow:2px 2px 0 var(--ink); transform:translate(-1px,-1px); }
-  .btn:active{ box-shadow:none; transform:translate(0,0); }
-  .btn.primary{ background:var(--ink); color:var(--parchment); }
-  .btn.ghost{ background:transparent; }
-  .btn.small{ padding:5px 9px; font-size:10.5px; }
-  .btn:disabled{ opacity:.4; cursor:not-allowed; box-shadow:none; transform:none; }
+  /* Map switcher */
+  .map-switcher{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed var(--line);}
 
-  .map-wrap{
-    position:relative;
-    border:1px solid var(--line);
-    background:
-      repeating-linear-gradient(45deg, rgba(36,31,26,0.025) 0 2px, transparent 2px 7px),
-      var(--parchment);
-  }
-  svg.hexmap{ width:100%; height:auto; display:block; }
-  .hex{ cursor:pointer; }
-  .hex polygon{ stroke:var(--ink); stroke-width:1.1; }
-  .hex:hover polygon{ stroke-width:1.8; }
-  .hex.hidden polygon{ fill:url(#hatchFill); stroke:var(--line); }
-  .hex.movable:hover polygon{ stroke:var(--rust); stroke-width:2; }
-  .hex-label{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:7.5px;
-    fill:var(--ink-soft);
-    pointer-events:none;
-  }
-  .current-marker{ pointer-events:none; }
+  /* Map */
+  .map-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;}
+  .map-wrap{position:relative;border:1px solid var(--line);background:repeating-linear-gradient(45deg,rgba(36,31,26,.025) 0 2px,transparent 2px 7px),var(--parchment);}
+  svg.hexmap{width:100%;height:auto;display:block;}
+  .hex{cursor:pointer;} .hex polygon{stroke:var(--ink);stroke-width:1.1;}
+  .hex:hover polygon{stroke-width:1.8;} .hex.hidden polygon{fill:url(#hatchFill);stroke:var(--line);}
+  .hex.movable:hover polygon{stroke:var(--rust);stroke-width:2;}
+  .hex-label{font-family:'IBM Plex Mono',monospace;font-size:7.5px;fill:var(--ink-soft);pointer-events:none;}
+  .current-marker{pointer-events:none;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-soft);}
+  .legend .item{display:flex;align-items:center;gap:6px;}
+  .legend .swatch{width:11px;height:11px;border:1px solid var(--ink);display:inline-block;}
 
-  .legend{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px 16px;
-    margin-top:12px;
-    padding-top:12px;
-    border-top:1px dashed var(--line);
-    font-family:'IBM Plex Mono', monospace;
-    font-size:10.5px;
-    color:var(--ink-soft);
-  }
-  .legend .item{ display:flex; align-items:center; gap:6px; }
-  .legend .swatch{ width:11px; height:11px; border:1px solid var(--ink); display:inline-block; }
+  /* Hex detail */
+  .hex-detail{margin-top:12px;padding:10px 12px;border:1px solid var(--line);background:var(--parchment);font-size:13.5px;min-height:20px;}
+  .hex-detail .hd-title{font-family:'Fraunces',serif;font-weight:600;font-size:15px;margin-bottom:2px;}
+  .hex-detail .hd-meta{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--brass-deep);}
+  .hd-rename{display:flex;gap:6px;margin-top:9px;}
+  .hd-rename input{flex:1;font-family:'Spectral',serif;font-size:12.5px;padding:5px 7px;border:1px solid var(--line);background:var(--parchment-panel);color:var(--ink);}
+  .hd-section{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);}
+  .hd-section-label{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--brass-deep);margin-bottom:5px;}
+  .hd-link{font-size:13px;padding:2px 0;}
+  .hd-empty{font-size:12.5px;color:var(--ink-soft);font-style:italic;}
 
-  .hex-detail{
-    margin-top:12px;
-    padding:10px 12px;
-    border:1px solid var(--line);
-    background:var(--parchment);
-    font-size:13.5px;
-    min-height:20px;
-  }
-  .hex-detail .hd-title{ font-family:'Fraunces', serif; font-weight:600; font-size:15px; margin-bottom:2px; }
-  .hex-detail .hd-meta{ font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--brass-deep); }
-  .hd-rename{ display:flex; gap:6px; margin-top:9px; }
-  .hd-rename input{
-    flex:1;
-    font-family:'Spectral', serif;
-    font-size:12.5px;
-    padding:5px 7px;
-    border:1px solid var(--line);
-    background:var(--parchment-panel);
-    color:var(--ink);
-  }
-  .hd-section{ margin-top:10px; padding-top:8px; border-top:1px dashed var(--line); }
-  .hd-section-label{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:10px;
-    text-transform:uppercase;
-    letter-spacing:0.08em;
-    color:var(--brass-deep);
-    margin-bottom:5px;
-  }
-  .hd-link{ font-size:13px; padding:2px 0; }
-  .hd-empty{ font-size:12.5px; color:var(--ink-soft); font-style:italic; }
+  /* Tension */
+  .pending-indicator{margin-top:14px;padding-top:10px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--ink-soft);font-style:italic;}
+  .pending-indicator.ready{color:var(--rust);font-style:normal;font-weight:600;}
+  .tension-row{display:flex;gap:16px;align-items:center;}
+  .dial-wrap{flex:0 0 auto;}
+  .dial-readout{flex:1;}
+  .dial-readout .reading{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;line-height:1;}
+  .dial-readout .reading span{font-size:13px;color:var(--ink-soft);font-weight:400;}
+  .dial-readout .desc{font-size:12.5px;color:var(--ink-soft);margin-top:4px;max-width:32ch;}
+  .modifier-hint{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--rust);margin-top:3px;}
+  .freq-control{margin-top:12px;}
+  .freq-control label{font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--brass-deep);display:flex;justify-content:space-between;}
+  input[type=range]{width:100%;accent-color:var(--rust);margin-top:4px;}
+  .tension-actions{display:flex;gap:8px;margin-top:12px;}
 
-  /* ---------- Pending tension indicator ---------- */
-  .pending-indicator{
-    margin-top:14px;
-    padding-top:10px;
-    border-top:1px dashed var(--line);
-    font-size:12.5px;
-    color:var(--ink-soft);
-    font-style:italic;
-  }
-  .pending-indicator.ready{ color:var(--rust); font-style:normal; font-weight:600; }
+  /* Event */
+  .event-card{border:1px solid var(--ink);background:var(--parchment);padding:12px 13px;}
+  .event-card-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .event-card-body{font-size:14.5px;margin-top:8px;line-height:1.45;}
+  .event-complications{margin-top:10px;padding:9px 10px;border:1px solid var(--rust);background:rgba(156,59,46,.07);}
+  .complication-line{font-size:13px;padding:2px 0;}
+  .event-clear{margin-top:9px;font-size:12.5px;color:var(--ink-soft);font-style:italic;}
 
-  /* ---------- Event / Encounter card ---------- */
-  .event-card{ border:1px solid var(--ink); background:var(--parchment); padding:12px 13px; }
-  .event-card-head{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-  .event-card-body{ font-size:14.5px; margin-top:8px; line-height:1.45; }
-  .event-complications{
-    margin-top:10px;
-    padding:9px 10px;
-    border:1px solid var(--rust);
-    background:rgba(156,59,46,0.07);
-  }
-  .complication-line{ font-size:13px; padding:2px 0; }
-  .event-clear{ margin-top:9px; font-size:12.5px; color:var(--ink-soft); font-style:italic; }
+  /* Log */
+  .log{margin-top:14px;max-height:160px;overflow-y:auto;border-top:1px dashed var(--line);padding-top:10px;}
+  .log-entry{font-size:13px;padding:6px 0;border-bottom:1px solid rgba(187,168,116,.4);}
+  .log-entry:last-child{border-bottom:none;}
+  .log-entry .tag{font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;color:var(--rust);letter-spacing:.06em;margin-right:6px;}
+  .log-empty{font-size:12.5px;color:var(--ink-soft);font-style:italic;}
 
-  /* ---------- Tension dial ---------- */
-  .tension-row{
-    display:flex;
-    gap:16px;
-    align-items:center;
-  }
-  .dial-wrap{ flex:0 0 auto; }
-  .dial-readout{ flex:1; }
-  .dial-readout .reading{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:26px;
-    font-weight:600;
-    line-height:1;
-  }
-  .dial-readout .reading span{ font-size:13px; color:var(--ink-soft); font-weight:400; }
-  .dial-readout .desc{ font-size:12.5px; color:var(--ink-soft); margin-top:4px; max-width:32ch; }
-  .freq-control{ margin-top:12px; }
-  .freq-control label{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:10.5px;
-    text-transform:uppercase;
-    letter-spacing:0.08em;
-    color:var(--brass-deep);
-    display:flex;
-    justify-content:space-between;
-  }
-  input[type=range]{
-    width:100%;
-    accent-color:var(--rust);
-    margin-top:4px;
-  }
-  .tension-actions{ display:flex; gap:8px; margin-top:12px; }
+  /* Tabs */
+  .tabs{display:flex;border-bottom:1px solid var(--line);}
+  .tab-btn{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:none;border:none;padding:10px 14px;cursor:pointer;color:var(--ink-soft);border-bottom:2px solid transparent;margin-bottom:-1px;}
+  .tab-btn.active{color:var(--ink);border-bottom-color:var(--rust);font-weight:600;}
+  .tab-panel{display:none;} .tab-panel.active{display:block;}
 
-  .log{
-    margin-top:14px;
-    max-height:160px;
-    overflow-y:auto;
-    border-top:1px dashed var(--line);
-    padding-top:10px;
-  }
-  .log-entry{
-    font-size:13px;
-    padding:6px 0;
-    border-bottom:1px solid rgba(187,168,116,0.4);
-  }
-  .log-entry:last-child{ border-bottom:none; }
-  .log-entry .tag{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:9.5px;
-    text-transform:uppercase;
-    color:var(--rust);
-    letter-spacing:0.06em;
-    margin-right:6px;
-  }
-  .log-empty{ font-size:12.5px; color:var(--ink-soft); font-style:italic; }
+  /* Forms */
+  .field{margin-bottom:10px;}
+  .field label{display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--brass-deep);margin-bottom:3px;}
+  .field input[type=text],.field input[type=url],.field textarea,.field select{width:100%;font-family:'Spectral',serif;font-size:13.5px;padding:7px 8px;border:1px solid var(--ink);background:var(--parchment);color:var(--ink);}
+  .field textarea{resize:vertical;min-height:42px;}
+  .field .hint{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--ink-soft);margin-top:3px;}
+  .row{display:flex;gap:8px;} .row>*{flex:1;min-width:0;}
 
-  /* ---------- Tabs ---------- */
-  .tabs{ display:flex; border-bottom:1px solid var(--line); }
-  .tab-btn{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:11px;
-    letter-spacing:0.06em;
-    text-transform:uppercase;
-    background:none;
-    border:none;
-    padding:10px 14px;
-    cursor:pointer;
-    color:var(--ink-soft);
-    border-bottom:2px solid transparent;
-    margin-bottom:-1px;
-  }
-  .tab-btn.active{ color:var(--ink); border-bottom-color:var(--rust); font-weight:600; }
-  .tab-panel{ display:none; }
-  .tab-panel.active{ display:block; }
+  /* Cards */
+  .card{border:1px solid var(--line);background:var(--parchment);padding:10px 12px;margin-bottom:10px;position:relative;}
+  .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .card-title{font-family:'Fraunces',serif;font-weight:600;font-size:15px;}
+  .card-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--brass-deep);margin-top:1px;}
+  .card-body{font-size:13.5px;margin-top:6px;color:var(--ink-soft);}
+  .card-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+  .pill{font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;border:1px solid var(--ink);display:inline-block;}
+  .pill.active{background:var(--moss);color:#fff;border-color:var(--moss);}
+  .pill.done{background:var(--brass);color:#fff;border-color:var(--brass);}
+  .pill.failed{background:var(--rust);color:#fff;border-color:var(--rust);}
+  .thumb{width:34px;height:34px;border:1px solid var(--ink);background:var(--parchment-deep);object-fit:cover;flex:0 0 auto;}
+  .empty-state{font-size:13px;color:var(--ink-soft);font-style:italic;padding:14px 4px;}
 
-  /* ---------- Forms ---------- */
-  .field{ margin-bottom:10px; }
-  .field label{
-    display:block;
-    font-family:'IBM Plex Mono', monospace;
-    font-size:10px;
-    text-transform:uppercase;
-    letter-spacing:0.08em;
-    color:var(--brass-deep);
-    margin-bottom:3px;
-  }
-  .field input[type=text], .field input[type=url], .field textarea, .field select{
-    width:100%;
-    font-family:'Spectral', serif;
-    font-size:13.5px;
-    padding:7px 8px;
-    border:1px solid var(--ink);
-    background:var(--parchment);
-    color:var(--ink);
-  }
-  .field textarea{ resize:vertical; min-height:42px; }
-  .field .hint{ font-family:'IBM Plex Mono', monospace; font-size:9.5px; color:var(--ink-soft); margin-top:3px; }
-  .row{ display:flex; gap:8px; }
-  .row > *{ flex:1; min-width:0; }
+  /* Error banner */
+  .error-banner{display:none;border:1px solid var(--rust);background:rgba(156,59,46,.08);padding:12px 14px;margin-bottom:16px;}
+  .error-banner.visible{display:block;}
+  .error-banner-head{display:flex;justify-content:space-between;align-items:center;}
+  .error-banner-title{font-family:'Fraunces',serif;font-weight:600;color:var(--rust);font-size:15px;}
+  .error-banner ul{margin:8px 0 0;padding-left:20px;font-size:13px;}
+  .error-banner li{margin-bottom:3px;}
+  .error-banner .close-x{background:none;border:none;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--rust);}
+  .inline-errors{margin-top:10px;} .inline-errors:empty{display:none;}
 
-  /* ---------- Cards ---------- */
-  .card{
-    border:1px solid var(--line);
-    background:var(--parchment);
-    padding:10px 12px;
-    margin-bottom:10px;
-    position:relative;
-  }
-  .card-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
-  .card-title{ font-family:'Fraunces', serif; font-weight:600; font-size:15px; }
-  .card-sub{ font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--brass-deep); margin-top:1px; }
-  .card-body{ font-size:13.5px; margin-top:6px; color:var(--ink-soft); }
-  .card-actions{ display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
-  .pill{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:9.5px;
-    text-transform:uppercase;
-    letter-spacing:0.05em;
-    padding:3px 7px;
-    border:1px solid var(--ink);
-    display:inline-block;
-  }
-  .pill.active{ background:var(--moss); color:#fff; border-color:var(--moss); }
-  .pill.done{ background:var(--brass); color:#fff; border-color:var(--brass); }
-  .pill.failed{ background:var(--rust); color:#fff; border-color:var(--rust); }
-  .thumb{
-    width:34px; height:34px;
-    border:1px solid var(--ink);
-    background:var(--parchment-deep);
-    object-fit:cover;
-    flex:0 0 auto;
-  }
-  .empty-state{
-    font-size:13px;
-    color:var(--ink-soft);
-    font-style:italic;
-    padding:14px 4px;
-  }
+  /* Dialog */
+  dialog{border:1px solid var(--ink);background:var(--parchment-panel);box-shadow:5px 5px 0 rgba(36,31,26,.18);padding:0;max-width:480px;width:92vw;}
+  dialog::backdrop{background:rgba(36,31,26,.45);}
+  .dialog-head{padding:14px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--parchment-panel),var(--parchment-deep));}
+  .dialog-head h3{font-family:'Fraunces',serif;font-size:18px;margin:0;}
+  .dialog-body{padding:16px 18px;}
+  .template-picker{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);padding:10px 12px;margin-bottom:12px;background:var(--parchment);}
+  .template-picker .tp-label{font-size:13px;flex:1;min-width:0;overflow-wrap:anywhere;}
+  .template-picker .tp-name{font-weight:600;}
+  .template-picker .tp-actions{display:flex;gap:6px;flex-shrink:0;}
+  .dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
 
-  /* ---------- Error banner ---------- */
-  .error-banner{
-    display:none;
-    border:1px solid var(--rust);
-    background:rgba(156,59,46,0.08);
-    padding:12px 14px;
-    margin-bottom:16px;
-  }
-  .error-banner.visible{ display:block; }
-  .error-banner-head{ display:flex; justify-content:space-between; align-items:center; }
-  .error-banner-title{ font-family:'Fraunces', serif; font-weight:600; color:var(--rust); font-size:15px; }
-  .error-banner ul{ margin:8px 0 0; padding-left:20px; font-size:13px; }
-  .error-banner li{ margin-bottom:3px; }
-  .error-banner .close-x{ background:none; border:none; cursor:pointer; font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--rust); }
-  .inline-errors{ margin-top:10px; }
-  .inline-errors:empty{ display:none; }
-
-  /* ---------- Dialog ---------- */
-  dialog{
-    border:1px solid var(--ink);
-    background:var(--parchment-panel);
-    box-shadow:5px 5px 0 rgba(36,31,26,0.18);
-    padding:0;
-    max-width:480px;
-    width:92vw;
-  }
-  dialog::backdrop{ background:rgba(36,31,26,0.45); }
-  .dialog-head{
-    padding:14px 18px;
-    border-bottom:1px solid var(--line);
-    background:linear-gradient(180deg, var(--parchment-panel), var(--parchment-deep));
-  }
-  .dialog-head h3{ font-family:'Fraunces', serif; font-size:18px; margin:0; }
-  .dialog-body{ padding:16px 18px; }
-  .template-picker{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    border:1px solid var(--line);
-    padding:10px 12px;
-    margin-bottom:12px;
-    background:var(--parchment);
-  }
-  .template-picker .tp-label{ font-size:13px; flex:1; min-width:0; overflow-wrap:anywhere; }
-  .template-picker .tp-name{ font-weight:600; }
-  .template-picker .tp-actions{ display:flex; gap:6px; flex-shrink:0; }
-  .dialog-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:14px; }
-
-  ::-webkit-scrollbar{ width:8px; }
-  ::-webkit-scrollbar-thumb{ background:var(--brass); }
-  ::-webkit-scrollbar-track{ background:var(--parchment-deep); }
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--brass);}
+  ::-webkit-scrollbar-track{background:var(--parchment-deep);}
 </style>
 </head>
 <body>
@@ -437,7 +169,7 @@
   <div class="error-banner" id="globalErrorBanner">
     <div class="error-banner-head">
       <span class="error-banner-title" id="globalErrorTitle">Something needed attention</span>
-      <button class="close-x" id="globalErrorClose">✕ dismiss</button>
+      <button class="close-x" id="globalErrorClose">&#x2715; dismiss</button>
     </div>
     <ul id="globalErrorList"></ul>
   </div>
@@ -445,62 +177,64 @@
   <header class="app-header">
     <div class="title-block">
       <h1>Field Companion</h1>
-      <div class="sub">Solo Play Toolkit · Bookkeeping &amp; Oracle, Not Arbitration</div>
+      <div class="sub">Solo Play Toolkit &middot; Bookkeeping &amp; Oracle, Not Arbitration</div>
     </div>
     <div class="header-right">
       <div class="header-actions">
         <button class="btn primary small" id="btnOpenNewGame">New Game</button>
-        <button class="btn ghost small" id="btnOpenLoadGame">Load Game</button>
-        <button class="btn ghost small" id="btnSaveGame">Save Game</button>
+        <button class="btn ghost small"   id="btnOpenLoadGame">Load Game</button>
+        <button class="btn ghost small"   id="btnSaveGame">Save Game</button>
       </div>
-      <div class="setting-chip">
-        Setting: <b id="activeSettingLabel">The Hollow Reach</b>
-      </div>
+      <div class="setting-chip">Setting: <b id="activeSettingLabel">The Hollow Reach</b></div>
     </div>
   </header>
 
   <input type="file" id="fileLoadGame" accept="application/json,.json" style="display:none;">
+  <input type="file" id="fileLoadMap"  accept="application/json,.json" style="display:none;">
 
-  <!-- ===================== NEW GAME DIALOG ===================== -->
+  <!-- NEW GAME DIALOG -->
   <dialog id="newGameDialog">
     <div class="dialog-head"><h3>New Game</h3></div>
     <div class="dialog-body">
       <div class="template-picker">
-        <div class="tp-label">Setting Template<br><span class="tp-name" id="settingPickLabel">Default — The Hollow Reach</span></div>
+        <div class="tp-label">Setting Template<br><span class="tp-name" id="settingPickLabel">Default &mdash; The Hollow Reach</span></div>
         <div class="tp-actions">
-          <button class="btn ghost small" id="btnPickSetting">Choose File…</button>
+          <button class="btn ghost small" id="btnPickSetting">Choose File&hellip;</button>
           <button class="btn ghost small" id="btnClearSetting">Use Default</button>
         </div>
       </div>
       <div class="template-picker">
-        <div class="tp-label">Map Template<br><span class="tp-name" id="mapPickLabel">Default — Generated, radius 4</span></div>
+        <div class="tp-label">Starting Map Template<br><span class="tp-name" id="mapPickLabel">Default &mdash; Generated, radius 4</span></div>
         <div class="tp-actions">
-          <button class="btn ghost small" id="btnPickMap">Choose File…</button>
+          <button class="btn ghost small" id="btnPickMap">Choose File&hellip;</button>
           <button class="btn ghost small" id="btnClearMap">Use Default</button>
         </div>
       </div>
       <input type="file" id="fileSettingTemplate" accept="application/json,.json" style="display:none;">
-      <input type="file" id="fileMapTemplate" accept="application/json,.json" style="display:none;">
+      <input type="file" id="fileMapTemplate"     accept="application/json,.json" style="display:none;">
       <div class="inline-errors" id="newGameErrors"></div>
       <div class="dialog-actions">
-        <button class="btn ghost small" id="btnCancelNewGame">Cancel</button>
-        <button class="btn primary small" id="btnStartNewGame">Start New Game</button>
+        <button class="btn ghost small"    id="btnCancelNewGame">Cancel</button>
+        <button class="btn primary small"  id="btnStartNewGame">Start New Game</button>
       </div>
     </div>
   </dialog>
 
   <div class="layout">
 
-    <!-- ===================== MAP PANEL ===================== -->
+    <!-- MAP PANEL -->
     <section class="panel">
       <div class="panel-head">
-        <h2 id="mapTitle">The Hollow Reach</h2>
-        <span class="eyebrow">Hex Map · Fog of War</span>
+        <h2 id="mapPanelTitle">The Hollow Reach</h2>
+        <span class="eyebrow">Hex Map &middot; Fog of War</span>
       </div>
       <div class="panel-body">
+        <div id="mapSwitcher" class="map-switcher" style="display:none;"></div>
         <div class="map-toolbar">
-          <button class="btn ghost small" id="btnRevealAll">Reveal All (debug)</button>
-          <button class="btn ghost small" id="btnResetFog">Reset Fog (debug)</button>
+          <button class="btn primary small" id="btnMoveToHex" style="display:none;">Move Here</button>
+          <button class="btn ghost small"   id="btnLoadMap">+ Load Map</button>
+          <button class="btn ghost small"   id="btnRevealAll">Reveal All (debug)</button>
+          <button class="btn ghost small"   id="btnResetFog">Reset Fog (debug)</button>
         </div>
         <div class="map-wrap">
           <svg class="hexmap" id="hexmap" xmlns="http://www.w3.org/2000/svg">
@@ -514,33 +248,33 @@
           </svg>
         </div>
         <div class="hex-detail" id="hexDetail">
-          <span class="empty-state">Click any hex to inspect it. Hexes adjacent to your marker (the brass star) — or already explored — will offer a move/travel button.</span>
+          <span class="empty-state">Click any hex to inspect it. Adjacent or already-explored hexes will offer a move/travel button above.</span>
         </div>
         <div class="legend" id="legend"></div>
       </div>
     </section>
 
-    <!-- ===================== RIGHT COLUMN ===================== -->
+    <!-- RIGHT COLUMN -->
     <div>
-      <!-- Event / Encounter generator (central feature) -->
+      <!-- Event / Encounter -->
       <section class="panel" style="margin-bottom:18px;">
         <div class="panel-head">
           <h2>Event / Encounter</h2>
           <span class="eyebrow">Where complications surface</span>
         </div>
         <div class="panel-body">
-          <button class="btn primary" id="btnGenerateEvent" style="width:100%; padding:13px; font-size:13px;">Generate Event / Encounter</button>
+          <button class="btn primary" id="btnGenerateEvent" style="width:100%;padding:13px;font-size:13px;">Generate Event / Encounter</button>
           <div id="eventResult" style="margin-top:12px;">
-            <div class="empty-state">Generate an event to see what the road brings. Any complications that have built up will surface here too.</div>
+            <div class="empty-state">Generate an event to see what the road brings.</div>
           </div>
-          <div style="margin-top:14px; padding-top:10px; border-top:1px dashed var(--line);">
+          <div style="margin-top:14px;padding-top:10px;border-top:1px dashed var(--line);">
             <div class="hd-section-label">History</div>
             <div class="log" id="eventLog"><div class="log-empty">Nothing has happened yet.</div></div>
           </div>
         </div>
       </section>
 
-      <!-- Tension dial -->
+      <!-- Tension -->
       <section class="panel" style="margin-bottom:18px;">
         <div class="panel-head">
           <h2>Tension</h2>
@@ -551,7 +285,7 @@
             <div class="dial-wrap">
               <svg width="120" height="76" viewBox="0 0 120 76">
                 <path d="M10,70 A50,50 0 0 1 110,70" fill="none" stroke="#ddcda3" stroke-width="12" stroke-linecap="round"></path>
-                <path id="dialArc" d="M10,70 A50,50 0 0 1 110,70" fill="none" stroke="#9c3b2e" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 157" ></path>
+                <path id="dialArc" d="M10,70 A50,50 0 0 1 110,70" fill="none" stroke="#9c3b2e" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 157"></path>
                 <g id="dialNeedle" transform="rotate(0 60 70)">
                   <line x1="60" y1="70" x2="60" y2="24" stroke="#241f1a" stroke-width="2.5"></line>
                   <circle cx="60" cy="70" r="5" fill="#a8763e" stroke="#241f1a" stroke-width="1"></circle>
@@ -561,6 +295,7 @@
             <div class="dial-readout">
               <div class="reading"><span id="tensionVal">12</span><span>/100</span></div>
               <div class="desc" id="tensionDesc">Calm. A complication is unlikely right now.</div>
+              <div class="modifier-hint" id="tensionModifier"></div>
             </div>
           </div>
           <div class="freq-control">
@@ -569,85 +304,64 @@
           </div>
           <div class="tension-actions">
             <button class="btn primary small" id="btnCheckTension">Check Now</button>
-            <button class="btn ghost small" id="btnResetTension">Reset Clock</button>
+            <button class="btn ghost small"   id="btnResetTension">Reset Clock</button>
           </div>
           <div class="pending-indicator" id="pendingIndicator">No complications pending.</div>
         </div>
       </section>
 
-      <!-- Tabs: NPCs / Quests -->
+      <!-- NPCs / Quests -->
       <section class="panel">
         <div class="tabs">
           <button class="tab-btn active" data-tab="npcs">NPCs</button>
           <button class="tab-btn" data-tab="quests">Quests</button>
         </div>
         <div class="panel-body">
-
-          <!-- NPC TAB -->
           <div class="tab-panel active" id="tab-npcs">
             <div class="row" style="margin-bottom:10px;">
               <button class="btn primary" id="btnGenNpc" style="flex:1;">Generate NPC</button>
             </div>
             <div id="npcDraft"></div>
-            <div style="margin-top:14px; padding-top:12px; border-top:1px dashed var(--line);">
-              <div class="hd-section-label">Roster — Remembered NPCs</div>
-              <div id="npcRoster"><div class="empty-state">No one's been recorded yet. Generate an NPC, then save them to the roster.</div></div>
+            <div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);">
+              <div class="hd-section-label">Roster &mdash; Remembered NPCs</div>
+              <div id="npcRoster"><div class="empty-state">No one recorded yet.</div></div>
             </div>
           </div>
-
-          <!-- QUEST TAB -->
           <div class="tab-panel" id="tab-quests">
             <div class="row" style="margin-bottom:10px;">
               <button class="btn primary" id="btnGenQuest" style="flex:1;">Generate Quest Hook</button>
             </div>
-            <div id="questList"><div class="empty-state">No quests yet. Generate a hook to get started.</div></div>
+            <div id="questList"><div class="empty-state">No quests yet.</div></div>
           </div>
-
         </div>
       </section>
     </div>
   </div>
 </div>
-
 <script>
-/* =========================================================
-   BUILT-IN DEFAULT TEMPLATES
-   These act as the fallback whenever no file is chosen, or
-   whenever a chosen file fails validation.
-   ========================================================= */
+/* ==========================================================
+   DEFAULT SETTING TEMPLATE
+   Terrain and encounter tables have moved to Map Templates.
+   The setting contributes: name pools, quest templates,
+   complications, tension defaults, and generic encounters
+   (entries pooled into every event regardless of map/terrain).
+   ========================================================== */
 const DEFAULT_SETTING_TEMPLATE = {
-  templateId: 'hollow-reach',
-  templateVersion: 1,
-  schemaVersion: 1,
-  meta: {
-    name: 'The Hollow Reach',
-    genre: 'low-fantasy',
-    author: 'built-in',
-    description: 'A damp, half-forgotten borderland.'
+  templateId:'hollow-reach', templateVersion:1, schemaVersion:1,
+  meta:{ name:'The Hollow Reach', genre:'low-fantasy', author:'built-in', description:'A damp, half-forgotten borderland.' },
+  namePools:{
+    npcFirstNames:['Brennic','Sera','Oddvan','Maelis','Thurn','Yseult','Corrin','Davna','Petrik','Ilsabet','Garrow','Niamhe','Aldous','Wrenna','Tobin','Cael','Hessa','Drosten'],
+    npcSurnames:['Ashford','Quillwright','Northgale','Hollowmere','Brackwater','Stonefell','Larkspur','Greycombe','Saltmarrow','Ferrowind','Duskbane','Ironcopse'],
+    professions:['hedge healer','ferryman','tax assessor','retired soldier','relic dealer','trapper','bell-ringer','grave warden','cartographer','smuggler','innkeep','itinerant scribe','beekeeper','road warden'],
+    traits:['counts everything under their breath','never removes their gloves','owes a debt they won\u2019t name','speaks of a sibling no one else has met','collects small bones','always knows which way is north','flinches at the sound of bells','keeps a second name for strangers'],
+    settlementNames:['Greywick','Tarnhollow','Fenbridge','Ashmere','Corvale','Sallowfield','Brackenford','Mirewatch'],
+    ruinNames:['the Sunken Hall','the Broken Choir','the Fallen Watch','the Cracked Vault','the Quiet Tower','the Drowned Court']
   },
-  terrain: {
-    plains:     { label:'Plains',     color:'#cfc596', weight:24 },
-    forest:     { label:'Forest',     color:'#5b6b47', weight:22 },
-    hills:      { label:'Hills',      color:'#b89a64', weight:15 },
-    mountains:  { label:'Mountains',  color:'#7a6e63', weight:10 },
-    water:      { label:'Water',      color:'#3f6363', weight:11 },
-    swamp:      { label:'Swamp',      color:'#6a6b47', weight:8  },
-    ruins:      { label:'Ruins',      color:'#9c8b6b', weight:6  },
-    settlement: { label:'Settlement', color:'#a8763e', weight:4  }
+  questTemplates:{
+    verbs:['retrieve','destroy','deliver','protect','expose the truth behind','find a buyer for','smuggle out','make peace over'],
+    items:['a sealed ledger','the Last King\u2019s signet','a sunken bell','an heirloom blade','a vial of grey salt','a child\u2019s letter, undelivered','a map with one corner burned','a debt marker in an old script']
   },
-  namePools: {
-    npcFirstNames: ['Brennic','Sera','Oddvan','Maelis','Thurn','Yseult','Corrin','Davna','Petrik','Ilsabet','Garrow','Niamhe','Aldous','Wrenna','Tobin','Cael','Hessa','Drosten'],
-    npcSurnames: ['Ashford','Quillwright','Northgale','Hollowmere','Brackwater','Stonefell','Larkspur','Greycombe','Saltmarrow','Ferrowind','Duskbane','Ironcopse'],
-    professions: ['hedge healer','ferryman','tax assessor','retired soldier','relic dealer','trapper','bell-ringer','grave warden','cartographer','smuggler','innkeep','itinerant scribe','beekeeper','road warden'],
-    traits: ['counts everything under their breath','never removes their gloves','owes a debt they won\u2019t name','speaks of a sibling no one else has met','collects small bones','always knows which way is north','flinches at the sound of bells','keeps a second name for strangers'],
-    settlementNames: ['Greywick','Tarnhollow','Fenbridge','Ashmere','Corvale','Sallowfield','Brackenford','Mirewatch'],
-    ruinNames: ['the Sunken Hall','the Broken Choir','the Fallen Watch','the Cracked Vault','the Quiet Tower','the Drowned Court']
-  },
-  questTemplates: {
-    verbs: ['retrieve','destroy','deliver','protect','expose the truth behind','find a buyer for','smuggle out','make peace over'],
-    items: ['a sealed ledger','the Last King\u2019s signet','a sunken bell','an heirloom blade','a vial of grey salt','a child\u2019s letter, undelivered','a map with one corner burned','a debt marker in an old script']
-  },
-  complications: [
+  complications:[
     'A resource you depend on turns out to be insufficient.',
     'Someone here recognizes you \u2014 for better or worse.',
     'The way forward is blocked; another route must be found.',
@@ -669,1076 +383,761 @@ const DEFAULT_SETTING_TEMPLATE = {
     'The path splits, and the choice costs you something either way.',
     'A clue points somewhere you did not expect to go.'
   ],
-  encounterTables: {
-    generic: [
-      {tag:'Quiet',     text:'The way is empty. Whatever happens here, you\u2019ll have to bring it yourself.'},
-      {tag:'Discovery', text:'You spot signs of recent passage \u2014 footprints, a cold fire, a dropped item.'},
-      {tag:'Traveler',  text:'A figure approaches from a distance, alone.'},
-      {tag:'Resource',  text:'Something useful presents itself, if you\u2019re willing to take the time.'}
-    ],
-    plains:     [ {tag:'Traveler',  text:'A trade caravan crosses your path, dust rising behind it.'},
-                  {tag:'Sign',      text:'Crows circle something low in the grass ahead.'} ],
-    forest:     [ {tag:'Sign',      text:'The canopy thins where something large has passed through recently.'},
-                  {tag:'Hazard',    text:'The undergrowth conceals uneven, treacherous ground.'} ],
-    hills:      [ {tag:'Discovery', text:'An old cairn marks this rise \u2014 someone wanted this place remembered.'},
-                  {tag:'Sign',      text:'The wind carries a sound that doesn\u2019t belong out here.'} ],
-    mountains:  [ {tag:'Hazard',    text:'Loose scree threatens the footing on the climb ahead.'},
-                  {tag:'Discovery', text:'A sheltered overhang shows signs of recent use.'} ],
-    water:      [ {tag:'Sign',      text:'Something moves just beneath the surface.'},
-                  {tag:'Resource',  text:'The water here runs clear and cold \u2014 worth filling your stores.'} ],
-    swamp:      [ {tag:'Hazard',    text:'The ground gives more than it should underfoot.'},
-                  {tag:'Sign',      text:'A faint, sourceless light flickers between the reeds.'} ],
-    ruins:      [ {tag:'Discovery', text:'Old stonework still bears marks worth puzzling over.'},
-                  {tag:'Hazard',    text:'Part of the structure looks ready to give way.'} ],
-    settlement: [ {tag:'Traveler',  text:'Locals eye you with the particular curiosity reserved for outsiders.'},
-                  {tag:'Discovery', text:'Word of something \u2014 a rumor, a job, a warning \u2014 reaches you quickly here.'} ]
-  },
-  tensionDefaults: { startingValue: 12, step: 12, bleedTo: 8, ceiling: 95 }
+  /* Setting-wide generic encounters — pooled into every event
+     regardless of which map or terrain is active. */
+  genericEncounters:[
+    {tag:'Contact',  text:'Someone seeks you out \u2014 they know your name.'},
+    {tag:'Rumour',   text:'Word reaches you of something happening elsewhere in the world.'},
+    {tag:'Memory',   text:'Something here triggers a recollection you\u2019d rather not have.'}
+  ],
+  tensionDefaults:{ startingValue:12, step:12, bleedTo:8, ceiling:95 }
 };
 
+/* ==========================================================
+   DEFAULT MAP TEMPLATE
+   Now owns terrain, encounterTables, meta, and tensionModifier.
+   ========================================================== */
 const DEFAULT_MAP_TEMPLATE = {
-  mapTemplateId: 'hollow-reach-default',
-  mapTemplateVersion: 1,
-  schemaVersion: 1,
-  settingTemplateId: 'hollow-reach',
-  mode: 'generated',
-  shape: 'hex-radius',
-  radius: 4,
-  hexSize: 30,
-  centerHex: { terrain: 'settlement', name: "Hollow's Watch", explored: true },
-  seed: null,
-  authoredHexes: []
+  mapTemplateId:'hollow-reach-default', mapTemplateVersion:1, schemaVersion:1,
+  settingTemplateId:'hollow-reach',
+  meta:{ name:"The Hollow Reach", description:'The starting wilderness region.' },
+  mode:'generated', shape:'hex-radius', radius:4, hexSize:30,
+  centerHex:{ terrain:'settlement', name:"Hollow's Watch", explored:true },
+  tensionModifier:1.0,
+  seed:null,
+  terrain:{
+    plains:    { label:'Plains',    color:'#cfc596', weight:24, icon:'plains'     },
+    forest:    { label:'Forest',    color:'#5b6b47', weight:22, icon:'forest'     },
+    hills:     { label:'Hills',     color:'#b89a64', weight:15, icon:'hills'      },
+    mountains: { label:'Mountains', color:'#7a6e63', weight:10, icon:'mountains'  },
+    water:     { label:'Water',     color:'#3f6363', weight:11, icon:'water'      },
+    swamp:     { label:'Swamp',     color:'#6a6b47', weight:8,  icon:'swamp'      },
+    ruins:     { label:'Ruins',     color:'#9c8b6b', weight:6,  icon:'ruins'      },
+    settlement:{ label:'Settlement',color:'#a8763e', weight:4,  icon:'settlement' }
+  },
+  encounterTables:{
+    generic:[
+      {tag:'Quiet',    text:'The way is empty. Whatever happens here, you\u2019ll have to bring it yourself.'},
+      {tag:'Discovery',text:'You spot signs of recent passage \u2014 footprints, a cold fire, a dropped item.'},
+      {tag:'Traveler', text:'A figure approaches from a distance, alone.'},
+      {tag:'Resource', text:'Something useful presents itself, if you\u2019re willing to take the time.'}
+    ],
+    plains:    [{tag:'Traveler', text:'A trade caravan crosses your path, dust rising behind it.'},
+                {tag:'Sign',     text:'Crows circle something low in the grass ahead.'}],
+    forest:    [{tag:'Sign',     text:'The canopy thins where something large has passed through recently.'},
+                {tag:'Hazard',   text:'The undergrowth conceals uneven, treacherous ground.'}],
+    hills:     [{tag:'Discovery',text:'An old cairn marks this rise \u2014 someone wanted this place remembered.'},
+                {tag:'Sign',     text:'The wind carries a sound that doesn\u2019t belong out here.'}],
+    mountains: [{tag:'Hazard',   text:'Loose scree threatens the footing on the climb ahead.'},
+                {tag:'Discovery',text:'A sheltered overhang shows signs of recent use.'}],
+    water:     [{tag:'Sign',     text:'Something moves just beneath the surface.'},
+                {tag:'Resource', text:'The water here runs clear and cold \u2014 worth filling your stores.'}],
+    swamp:     [{tag:'Hazard',   text:'The ground gives more than it should underfoot.'},
+                {tag:'Sign',     text:'A faint, sourceless light flickers between the reeds.'}],
+    ruins:     [{tag:'Discovery',text:'Old stonework still bears marks worth puzzling over.'},
+                {tag:'Hazard',   text:'Part of the structure looks ready to give way.'}],
+    settlement:[{tag:'Traveler', text:'Locals eye you with the particular curiosity reserved for outsiders.'},
+                {tag:'Discovery',text:'Word of something \u2014 a rumour, a job, a warning \u2014 reaches you quickly here.'}]
+  },
+  authoredHexes:[]
 };
 
-/* =========================================================
-   ACTIVE CONTENT (what's currently loaded — starts as default)
-   ========================================================= */
+/* ==========================================================
+   ACTIVE CONTENT & UI CONSTANTS
+   ========================================================== */
 let content = deepClone(DEFAULT_SETTING_TEMPLATE);
-let mapTemplateActive = deepClone(DEFAULT_MAP_TEMPLATE);
 
-/* Shared UI reset strings — single source of truth used by renderAll() */
-const EMPTY_HEX_DETAIL   = '<span class="empty-state">Click any hex to inspect it. Hexes adjacent to your marker (the brass star) — or already explored — will offer a move/travel button.</span>';
+const EMPTY_HEX_DETAIL   = '<span class="empty-state">Click any hex to inspect it. Adjacent or already-explored hexes will offer a move/travel button above.</span>';
 const EMPTY_EVENT_RESULT = '<div class="empty-state">Generate an event to see what the road brings. Any complications that have built up will surface here too.</div>';
 
-/* Tracks which hex is currently shown in the detail panel so
-   delegated hex-detail handlers don't need a closure. */
-let currentDetailHex = null;
+let currentDetailHex = null;  // which hex is shown in detail panel
 
-function deepClone(obj){ return JSON.parse(JSON.stringify(obj)); }
+function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
 
-/* =========================================================
-   STATE (the live save)
-   ========================================================= */
+/* ==========================================================
+   STATE  (schema v2 — maps array, tension object)
+   npcs:   { id, name, profession, trait, location:{mapId,hexId}|null, tags, notes, imageRef }
+   quests: { id, title, hook, status, npcId, location:{mapId,hexId}|null }
+   ========================================================== */
 const state = {
   saveId: 'save_' + Math.random().toString(36).slice(2,10),
-  hexes: new Map(),     // key = id "q,r" -> {id,q,r,terrain,explored,name,notes}
-  current: {q:0,r:0},
-  tension: 12,
-  step: 12,
-  pending: [],
-  npcs: [],              // {id,name,profession,trait,locationHexId,tags:[],notes,imageRef:{type,value}|null}
-  quests: [],             // {id,title,hook,status,npcId,locationHexId}
+  activeMapId: null,
+  maps: [],        // { id, templateId, templateVersion, templateSnapshot, hexes:Map, current:{q,r} }
+  tension: { value:12, step:12, bleedTo:8, ceiling:95, pending:[] },
+  npcs: [],
+  quests: [],
   log: [],
-  provenance: { settingTemplateId: DEFAULT_SETTING_TEMPLATE.templateId, settingTemplateVersion: DEFAULT_SETTING_TEMPLATE.templateVersion, mapTemplateId: DEFAULT_MAP_TEMPLATE.mapTemplateId, mapTemplateVersion: DEFAULT_MAP_TEMPLATE.mapTemplateVersion }
+  provenance: { settingTemplateId: DEFAULT_SETTING_TEMPLATE.templateId, settingTemplateVersion: DEFAULT_SETTING_TEMPLATE.templateVersion }
 };
 
-/* =========================================================
-   HEX MATH (flat-top axial) — RADIUS/SIZE now depend on the
-   active map template, so they're mutable.
-   ========================================================= */
+/* Helpers */
+function activeMap(){ return state.maps.find(m => m.id === state.activeMapId); }
+function activeSnap(){ return activeMap()?.templateSnapshot || {}; }
+
+/* ==========================================================
+   HEX MATH (flat-top axial)
+   SIZE is updated to the active map's hexSize on every switch.
+   ========================================================== */
 let SIZE = 30;
-let RADIUS = 4;
 
 function hexKey(q,r){ return q+','+r; }
 function cubeDistance(q1,r1,q2,r2){
-  const x1=q1, z1=r1, y1=-x1-z1;
-  const x2=q2, z2=r2, y2=-x2-z2;
-  return (Math.abs(x1-x2)+Math.abs(y1-y2)+Math.abs(z1-z2))/2;
+  const y1=-q1-r1, y2=-q2-r2;
+  return (Math.abs(q1-q2)+Math.abs(y1-y2)+Math.abs(r1-r2))/2;
 }
-function axialToPixel(q,r){
-  const x = SIZE * 1.5 * q;
-  const y = SIZE * Math.sqrt(3) * (r + q/2);
-  return {x,y};
-}
+function axialToPixel(q,r){ return { x:SIZE*1.5*q, y:SIZE*Math.sqrt(3)*(r+q/2) }; }
 function hexPolygonPoints(cx,cy){
-  let pts = [];
+  const pts=[];
   for(let i=0;i<6;i++){
-    const angle = Math.PI/180 * (60*i);
-    pts.push((cx+SIZE*Math.cos(angle)).toFixed(1)+','+(cy+SIZE*Math.sin(angle)).toFixed(1));
+    const a=Math.PI/180*60*i;
+    pts.push((cx+SIZE*Math.cos(a)).toFixed(1)+','+(cy+SIZE*Math.sin(a)).toFixed(1));
   }
   return pts.join(' ');
 }
-function neighbors(q,r){
-  const dirs = [[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]];
-  return dirs.map(([dq,dr])=>({q:q+dq, r:r+dr}));
-}
+function neighbors(q,r){ return [[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]].map(([dq,dr])=>({q:q+dq,r:r+dr})); }
 
-function weightedTerrain(){
-  const entries = Object.entries(content.terrain);
-  const total = entries.reduce((s,[,t])=>s+t.weight,0);
-  let roll = Math.random()*total;
-  for(const [key,t] of entries){
-    if(roll < t.weight) return key;
-    roll -= t.weight;
-  }
+function weightedTerrainFor(terrain){
+  const entries=Object.entries(terrain);
+  const total=entries.reduce((s,[,t])=>s+t.weight,0);
+  let roll=Math.random()*total;
+  for(const [key,t] of entries){ if(roll<t.weight) return key; roll-=t.weight; }
   return entries[0][0];
 }
 
-/* =========================================================
-   MAP GENERATION (driven by mapTemplateActive + content)
-   ========================================================= */
-function applyMapTemplate(map){
-  mapTemplateActive = map;
-  SIZE = map.hexSize || 30;
-  RADIUS = map.radius || 4;
-  state.hexes.clear();
-  state.current = {q:0,r:0};
+/* ==========================================================
+   MAP ENTRY CREATION  (replaces applyMapTemplate)
+   Builds a new map entry from a template without touching any
+   existing map state — safe to call mid-campaign.
+   ========================================================== */
+function createMapEntry(tpl){
+  const id  = 'map_' + Math.random().toString(36).slice(2,10);
+  const terrain = tpl.terrain || {};
+  const radius  = tpl.radius  || 4;
+  const hexes   = new Map();
 
-  if(map.mode === 'authored' && Array.isArray(map.authoredHexes) && map.authoredHexes.length){
-    for(const h of map.authoredHexes){
-      const id = hexKey(h.q, h.r);
-      state.hexes.set(id, {
-        id, q:h.q, r:h.r,
-        terrain: h.terrain,
-        explored: !!h.explored,
-        name: h.name || null,
-        notes: h.notes || ''
-      });
+  if(tpl.mode === 'authored' && Array.isArray(tpl.authoredHexes) && tpl.authoredHexes.length){
+    for(const h of tpl.authoredHexes){
+      const hid = hexKey(h.q,h.r);
+      hexes.set(hid,{ id:hid, q:h.q, r:h.r, terrain:h.terrain, explored:!!h.explored, name:h.name||null, notes:h.notes||'' });
     }
   } else {
-    for(let q=-RADIUS; q<=RADIUS; q++){
-      for(let r=-RADIUS; r<=RADIUS; r++){
-        if(cubeDistance(0,0,q,r) <= RADIUS){
-          const isCenter = (q===0 && r===0);
-          const id = hexKey(q,r);
-          state.hexes.set(id, {
-            id, q, r,
-            terrain: isCenter && map.centerHex ? (map.centerHex.terrain || weightedTerrain()) : weightedTerrain(),
+    for(let q=-radius;q<=radius;q++){
+      for(let r=-radius;r<=radius;r++){
+        if(cubeDistance(0,0,q,r)<=radius){
+          const isCenter=(q===0&&r===0);
+          const hid=hexKey(q,r);
+          hexes.set(hid,{
+            id:hid, q, r,
+            terrain: isCenter && tpl.centerHex?.terrain ? tpl.centerHex.terrain : weightedTerrainFor(terrain),
             explored: isCenter,
-            name: isCenter && map.centerHex ? (map.centerHex.name || null) : null,
-            notes: ''
+            name: isCenter && tpl.centerHex?.name ? tpl.centerHex.name : null,
+            notes:''
           });
         }
       }
     }
-    // Apply any pinned/authored overrides on top of the random fill
-    if(Array.isArray(map.authoredHexes)){
-      for(const h of map.authoredHexes){
-        const id = hexKey(h.q, h.r);
-        if(state.hexes.has(id)){
-          const existing = state.hexes.get(id);
-          state.hexes.set(id, { ...existing, terrain: h.terrain || existing.terrain, name: h.name || existing.name, explored: h.explored != null ? !!h.explored : existing.explored });
-        }
+    // Apply authored overrides on top of the random fill
+    for(const h of (tpl.authoredHexes||[])){
+      const hid=hexKey(h.q,h.r);
+      if(hexes.has(hid)){
+        const e=hexes.get(hid);
+        hexes.set(hid,{...e, terrain:h.terrain||e.terrain, name:h.name||e.name, explored:h.explored!=null?!!h.explored:e.explored});
       }
     }
   }
+  return { id, templateId:tpl.mapTemplateId||'custom', templateVersion:tpl.mapTemplateVersion||1, templateSnapshot:deepClone(tpl), hexes, current:{q:0,r:0} };
 }
 
-function nameForHex(hex){
-  if(hex.q===0 && hex.r===0 && mapTemplateActive.centerHex && mapTemplateActive.centerHex.name) return mapTemplateActive.centerHex.name;
+/* Switch the active map, update SIZE, reset detail UI */
+function switchToMap(id){
+  if(state.activeMapId===id) return;
+  state.activeMapId = id;
+  SIZE = activeSnap().hexSize || 30;
+  currentDetailHex = null;
+  document.getElementById('btnMoveToHex').style.display='none';
+  document.getElementById('hexDetail').innerHTML=EMPTY_HEX_DETAIL;
+  document.getElementById('mapPanelTitle').textContent = activeSnap().meta?.name || 'Map';
+  renderMapSwitcher();
+  renderMap();
+  renderTension();  // update modifier hint
+}
+
+/* ==========================================================
+   NAME GENERATION
+   Name pools come from the setting; terrain labels from the map.
+   ========================================================== */
+function nameForHex(hex, snap){
+  const terrain = snap?.terrain || {};
+  if(hex.q===0&&hex.r===0 && snap?.centerHex?.name) return snap.centerHex.name;
   const pools = content.namePools || {};
-  if(hex.terrain==='settlement' && pools.settlementNames && pools.settlementNames.length) return pools.settlementNames[Math.floor(Math.random()*pools.settlementNames.length)];
-  if(hex.terrain==='ruins' && pools.ruinNames && pools.ruinNames.length) return pools.ruinNames[Math.floor(Math.random()*pools.ruinNames.length)];
-  const label = (content.terrain[hex.terrain] && content.terrain[hex.terrain].label) || hex.terrain;
-  return `Hex ${hex.q},${hex.r} (${label})`;
+  if(hex.terrain==='settlement' && pools.settlementNames?.length)
+    return pools.settlementNames[Math.floor(Math.random()*pools.settlementNames.length)];
+  if(hex.terrain==='ruins' && pools.ruinNames?.length)
+    return pools.ruinNames[Math.floor(Math.random()*pools.ruinNames.length)];
+  return `Hex ${hex.q},${hex.r} (${terrain[hex.terrain]?.label||hex.terrain})`;
 }
 
-/* =========================================================
-   RENDER: MAP
-   ========================================================= */
-function terrainIconMarkup(type, cx, cy){
-  const s = SIZE*0.55;
-  switch(type){
-    case 'forest':
-      return `<polygon points="${cx},${cy-s} ${cx-s*0.6},${cy+s*0.5} ${cx+s*0.6},${cy+s*0.5}" fill="#3f4a30" opacity="0.55"></polygon>`;
-    case 'mountains':
-      return `<polygon points="${cx-s*0.7},${cy+s*0.5} ${cx},${cy-s} ${cx+s*0.7},${cy+s*0.5}" fill="#4a4038" opacity="0.5"></polygon>
-              <polygon points="${cx-s*0.15},${cy-s*0.25} ${cx+s*0.15},${cy-s*0.25} ${cx+s*0.3},${cy+s*0.5} ${cx-s*0.3},${cy+s*0.5}" fill="#fff" opacity="0.25"></polygon>`;
-    case 'hills':
-      return `<circle cx="${cx-s*0.35}" cy="${cy+s*0.2}" r="${s*0.45}" fill="#8a7042" opacity="0.45"></circle>
-              <circle cx="${cx+s*0.35}" cy="${cy+s*0.25}" r="${s*0.4}" fill="#8a7042" opacity="0.45"></circle>`;
-    case 'water':
-      return `<path d="M ${cx-s*0.7} ${cy} q ${s*0.35} ${-s*0.35}, ${s*0.7} 0 t ${s*0.7} 0" stroke="#1f3a3a" stroke-width="2" fill="none" opacity="0.55"></path>`;
-    case 'swamp':
-      return `<path d="M ${cx-s*0.6} ${cy+s*0.2} q ${s*0.3} ${-s*0.4}, ${s*0.6} 0 t ${s*0.6} 0" stroke="#2e2f1c" stroke-width="1.6" fill="none" opacity="0.5"></path>`;
-    case 'ruins':
-      return `<rect x="${cx-s*0.45}" y="${cy-s*0.1}" width="${s*0.25}" height="${s*0.65}" fill="#574a36" opacity="0.55"></rect>
-              <rect x="${cx+s*0.15}" y="${cy-s*0.35}" width="${s*0.22}" height="${s*0.9}" fill="#574a36" opacity="0.55"></rect>`;
-    case 'settlement':
-      return `<polygon points="${cx-s*0.4},${cy+s*0.45} ${cx-s*0.4},${cy} ${cx},${cy-s*0.45} ${cx+s*0.4},${cy} ${cx+s*0.4},${cy+s*0.45}" fill="#3a2a16" opacity="0.6"></polygon>`;
-    default:
-      return '';
+/* ==========================================================
+   BUILT-IN ICON SHAPES
+   Referenced by terrainDef.icon; terrainDef.iconUrl takes precedence.
+   Built-in names: plains, forest, hills, mountains, water, swamp, ruins, settlement
+   ========================================================== */
+const ICON_SHAPES = {
+  plains:()=>'',
+  forest:(cx,cy,s)=>`<polygon points="${cx},${cy-s} ${cx-s*.6},${cy+s*.5} ${cx+s*.6},${cy+s*.5}" fill="#3f4a30" opacity=".55"></polygon>`,
+  mountains:(cx,cy,s)=>`<polygon points="${cx-s*.7},${cy+s*.5} ${cx},${cy-s} ${cx+s*.7},${cy+s*.5}" fill="#4a4038" opacity=".5"></polygon><polygon points="${cx-s*.15},${cy-s*.25} ${cx+s*.15},${cy-s*.25} ${cx+s*.3},${cy+s*.5} ${cx-s*.3},${cy+s*.5}" fill="#fff" opacity=".25"></polygon>`,
+  hills:(cx,cy,s)=>`<circle cx="${cx-s*.35}" cy="${cy+s*.2}" r="${s*.45}" fill="#8a7042" opacity=".45"></circle><circle cx="${cx+s*.35}" cy="${cy+s*.25}" r="${s*.4}" fill="#8a7042" opacity=".45"></circle>`,
+  water:(cx,cy,s)=>`<path d="M ${cx-s*.7} ${cy} q ${s*.35} ${-s*.35}, ${s*.7} 0 t ${s*.7} 0" stroke="#1f3a3a" stroke-width="2" fill="none" opacity=".55"></path>`,
+  swamp:(cx,cy,s)=>`<path d="M ${cx-s*.6} ${cy+s*.2} q ${s*.3} ${-s*.4}, ${s*.6} 0 t ${s*.6} 0" stroke="#2e2f1c" stroke-width="1.6" fill="none" opacity=".5"></path>`,
+  ruins:(cx,cy,s)=>`<rect x="${cx-s*.45}" y="${cy-s*.1}" width="${s*.25}" height="${s*.65}" fill="#574a36" opacity=".55"></rect><rect x="${cx+s*.15}" y="${cy-s*.35}" width="${s*.22}" height="${s*.9}" fill="#574a36" opacity=".55"></rect>`,
+  settlement:(cx,cy,s)=>`<polygon points="${cx-s*.4},${cy+s*.45} ${cx-s*.4},${cy} ${cx},${cy-s*.45} ${cx+s*.4},${cy} ${cx+s*.4},${cy+s*.45}" fill="#3a2a16" opacity=".6"></polygon>`
+};
+
+function terrainIconMarkup(terrainDef,cx,cy){
+  const s=SIZE*.55;
+  if(terrainDef.iconUrl){
+    const pad=SIZE*.3;
+    return `<image href="${escapeAttr(terrainDef.iconUrl)}" x="${cx-SIZE+pad}" y="${cy-SIZE+pad}" width="${(SIZE-pad)*2}" height="${(SIZE-pad)*2}" preserveAspectRatio="xMidYMid meet" opacity=".85"></image>`;
   }
+  const fn=ICON_SHAPES[terrainDef.icon];
+  return fn ? fn(cx,cy,s) : '';
 }
 
-let svgEl, hexLayer;
+/* ==========================================================
+   MAP RENDERING
+   ========================================================== */
 function renderMap(){
-  svgEl = document.getElementById('hexmap');
-  hexLayer = document.getElementById('hexLayer');
-  hexLayer.innerHTML = '';
+  const map=activeMap();
+  const svgEl=document.getElementById('hexmap');
+  const hexLayer=document.getElementById('hexLayer');
+  hexLayer.innerHTML='';
+  if(!map){ svgEl.setAttribute('viewBox','0 0 100 100'); renderLegend(); return; }
 
-  const pts = [...state.hexes.values()].map(h=>axialToPixel(h.q,h.r));
-  if(pts.length === 0){ svgEl.setAttribute('viewBox', '0 0 100 100'); renderLegend(); return; }
-  const xs = pts.map(p=>p.x), ys = pts.map(p=>p.y);
-  const pad = SIZE*1.6;
-  const minX = Math.min(...xs)-pad, maxX = Math.max(...xs)+pad;
-  const minY = Math.min(...ys)-pad, maxY = Math.max(...ys)+pad;
-  svgEl.setAttribute('viewBox', `${minX} ${minY} ${maxX-minX} ${maxY-minY}`);
+  const snap=map.templateSnapshot;
+  const terrain=snap.terrain||{};
+  const pts=[...map.hexes.values()].map(h=>axialToPixel(h.q,h.r));
+  const xs=pts.map(p=>p.x), ys=pts.map(p=>p.y);
+  const pad=SIZE*1.6;
+  svgEl.setAttribute('viewBox',`${Math.min(...xs)-pad} ${Math.min(...ys)-pad} ${Math.max(...xs)-Math.min(...xs)+pad*2} ${Math.max(...ys)-Math.min(...ys)+pad*2}`);
 
-  const curNeighbors = neighbors(state.current.q, state.current.r).map(n=>hexKey(n.q,n.r));
-
-  for(const hex of state.hexes.values()){
-    const {x,y} = axialToPixel(hex.q,hex.r);
-    const isCurrent = hex.q===state.current.q && hex.r===state.current.r;
-    const isMovable = !isCurrent && curNeighbors.includes(hexKey(hex.q,hex.r));
-    const terrainDef = content.terrain[hex.terrain];
-    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
-    g.setAttribute('class', 'hex ' + (hex.explored ? 'explored' : 'hidden') + (isMovable ? ' movable':''));
-    g.dataset.key = hexKey(hex.q,hex.r);
-
-    const fill = hex.explored && terrainDef ? terrainDef.color : null;
-    g.innerHTML = `
-      <polygon points="${hexPolygonPoints(x,y)}" ${fill ? `fill="${fill}" fill-opacity="0.85"` : ''}></polygon>
-      ${hex.explored ? terrainIconMarkup(hex.terrain, x, y) : ''}
-      ${!hex.explored && isMovable ? `<text x="${x}" y="${y+4}" text-anchor="middle" class="hex-label" style="font-size:11px;">?</text>` : ''}
+  const curNeighbors=neighbors(map.current.q,map.current.r).map(n=>hexKey(n.q,n.r));
+  for(const hex of map.hexes.values()){
+    const {x,y}=axialToPixel(hex.q,hex.r);
+    const isCurrent=hex.q===map.current.q&&hex.r===map.current.r;
+    const isMovable=!isCurrent&&curNeighbors.includes(hex.id);
+    const tDef=terrain[hex.terrain]||{};
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('class','hex '+(hex.explored?'explored':'hidden')+(isMovable?' movable':''));
+    g.dataset.key=hex.id;
+    g.innerHTML=`
+      <polygon points="${hexPolygonPoints(x,y)}" ${hex.explored&&tDef.color?`fill="${tDef.color}" fill-opacity=".85"`:''}></polygon>
+      ${hex.explored?terrainIconMarkup(tDef,x,y):''}
+      ${!hex.explored&&isMovable?`<text x="${x}" y="${y+4}" text-anchor="middle" class="hex-label" style="font-size:11px;">?</text>`:''}
     `;
     if(isCurrent){
-      const star = document.createElementNS('http://www.w3.org/2000/svg','g');
+      const star=document.createElementNS('http://www.w3.org/2000/svg','g');
       star.setAttribute('class','current-marker');
-      star.innerHTML = `<text x="${x}" y="${y+6}" text-anchor="middle" font-size="20" fill="#9c3b2e">\u2605</text>`;
-      hexLayer.appendChild(g);
-      hexLayer.appendChild(star);
-    } else {
-      hexLayer.appendChild(g);
-    }
-
-    g.addEventListener('click', ()=> showHexDetail(hex));
+      star.innerHTML=`<text x="${x}" y="${y+6}" text-anchor="middle" font-size="20" fill="#9c3b2e">\u2605</text>`;
+      hexLayer.appendChild(g); hexLayer.appendChild(star);
+    } else { hexLayer.appendChild(g); }
+    g.addEventListener('click',()=>showHexDetail(hex));
   }
-
   renderLegend();
 }
 
 function renderLegend(){
-  const el = document.getElementById('legend');
-  el.innerHTML = Object.entries(content.terrain).map(([key,t])=>
-    `<span class="item"><span class="swatch" style="background:${t.color}"></span>${escapeHtml(t.label)}</span>`
-  ).join('') + `<span class="item"><span style="color:#9c3b2e;font-size:13px;">\u2605</span> Your position</span>`;
+  const terrain=activeSnap().terrain||{};
+  document.getElementById('legend').innerHTML=
+    Object.values(terrain).map(t=>`<span class="item"><span class="swatch" style="background:${t.color}"></span>${escapeHtml(t.label)}</span>`).join('')+
+    `<span class="item"><span style="color:#9c3b2e;font-size:13px;">\u2605</span> Your position</span>`;
 }
 
-function travelToHex(hex, distance){
-  state.current = {q:hex.q, r:hex.r};
-  hex.explored = true;
-  if(!hex.name) hex.name = nameForHex(hex);
+function renderMapSwitcher(){
+  const el=document.getElementById('mapSwitcher');
+  if(state.maps.length<=1){ el.style.display='none'; return; }
+  el.style.display='flex';
+  el.innerHTML=state.maps.map(m=>{
+    const name=m.templateSnapshot?.meta?.name||m.id;
+    const active=m.id===state.activeMapId;
+    return `<button class="btn ${active?'primary':'ghost'} small" data-action="switch-map" data-map-id="${m.id}">${escapeHtml(name)}</button>`;
+  }).join('');
+}
+
+/* ==========================================================
+   TRAVEL & HEX DETAIL
+   ========================================================== */
+function travelToHex(hex,distance){
+  const map=activeMap();
+  map.current={q:hex.q,r:hex.r};
+  hex.explored=true;
+  if(!hex.name) hex.name=nameForHex(hex,map.templateSnapshot);
   renderMap();
   showHexDetail(hex);
-  const isAdjacentMove = distance <= 1;
-  advanceTension(isAdjacentMove ? 'Moved to new ground' : 'Traveled to a known location');
+  advanceTension(distance<=1?'Moved to new ground':'Traveled to a known location');
 }
 
 function showHexDetail(hex){
-  currentDetailHex = hex;  // delegated handler reads this instead of a closure
-  const el = document.getElementById('hexDetail');
-  const distance = cubeDistance(state.current.q, state.current.r, hex.q, hex.r);
-  const isCurrent = distance === 0;
-  const isAdjacent = distance === 1;
-  const canTravel  = distance > 1 && hex.explored;
+  currentDetailHex=hex;
+  const map=activeMap();
+  const el=document.getElementById('hexDetail');
+  const moveBtn=document.getElementById('btnMoveToHex');
+  const dist=cubeDistance(map.current.q,map.current.r,hex.q,hex.r);
+  const isCurrent=dist===0, isAdjacent=dist===1, canTravel=dist>1&&hex.explored;
 
-  let actionBtn = '';
-  if(isAdjacent){
-    actionBtn = `<button class="btn primary small" data-action="hex-move" style="margin-top:10px;">${hex.explored ? 'Move Here' : 'Move Here &amp; Reveal'}</button>`;
-  } else if(canTravel){
-    actionBtn = `<button class="btn primary small" data-action="hex-move" style="margin-top:10px;">Travel Here (${distance} hexes)</button>`;
-  }
+  if(isAdjacent&&!hex.explored)      { moveBtn.textContent='Move Here \u0026 Reveal'; moveBtn.style.display=''; }
+  else if(isAdjacent)                 { moveBtn.textContent='Move Here';               moveBtn.style.display=''; }
+  else if(canTravel)                  { moveBtn.textContent=`Travel Here (${dist} hexes)`; moveBtn.style.display=''; }
+  else                                { moveBtn.style.display='none'; }
 
   if(!hex.explored){
-    el.innerHTML = `
-      <div class="hd-title">Unexplored</div>
-      <div class="hd-meta">Hex ${hex.q},${hex.r}</div>
-      <div class="hd-empty" style="margin-top:8px;">Nothing is known about this area yet.${isAdjacent ? '' : ' Move adjacent to it, hex by hex, to find out.'}</div>
-      ${actionBtn}
-    `;
+    el.innerHTML=`<div class="hd-title">Unexplored</div><div class="hd-meta">Hex ${hex.q},${hex.r}</div><div class="hd-empty" style="margin-top:8px;">Nothing is known about this area yet.${isAdjacent?'':' Move adjacent to it first.'}</div>`;
     return;
   }
 
-  const terrainLabel = (content.terrain[hex.terrain] && content.terrain[hex.terrain].label) || hex.terrain;
-  const npcsHere   = state.npcs.filter(n => n.locationHexId === hex.id);
-  const questsHere = state.quests.filter(q => q.locationHexId === hex.id);
-  el.innerHTML = `
-    <div class="hd-title">${escapeHtml(hex.name)}${isCurrent ? ' <span class="pill active" style="margin-left:6px;">here</span>' : ''}</div>
-    <div class="hd-meta">Hex ${hex.q},${hex.r} \u00b7 ${escapeHtml(terrainLabel)}${hex.q===0&&hex.r===0?' \u00b7 Starting Settlement':''}</div>
-    <div class="hd-rename">
-      <input type="text" id="hexRenameInput" value="${escapeHtml(hex.name)}">
-      <button class="btn ghost small" data-action="hex-rename">Rename</button>
-    </div>
-    ${actionBtn}
-    <div class="hd-section">
-      <div class="hd-section-label">Known NPCs here</div>
-      ${npcsHere.length
-        ? npcsHere.map(n=>`<div class="hd-link">${escapeHtml(n.name)} \u2014 ${escapeHtml(n.profession)}</div>`).join('')
-        : '<div class="hd-empty">No one recorded here yet.</div>'}
-    </div>
-    <div class="hd-section">
-      <div class="hd-section-label">Quests tied here</div>
-      ${questsHere.length
-        ? questsHere.map(q=>`<div class="hd-link">${escapeHtml(q.title)} <span class="pill ${q.status}" style="margin-left:4px;">${q.status}</span></div>`).join('')
-        : '<div class="hd-empty">Nothing tracked here yet.</div>'}
-    </div>
+  const snap=map.templateSnapshot;
+  const tLabel=snap.terrain?.[hex.terrain]?.label||hex.terrain;
+  const npcsHere  =state.npcs.filter(n=>n.location?.mapId===map.id&&n.location?.hexId===hex.id);
+  const questsHere=state.quests.filter(q=>q.location?.mapId===map.id&&q.location?.hexId===hex.id);
+  el.innerHTML=`
+    <div class="hd-title">${escapeHtml(hex.name)}${isCurrent?' <span class="pill active" style="margin-left:6px;">here</span>':''}</div>
+    <div class="hd-meta">Hex ${hex.q},${hex.r} \u00b7 ${escapeHtml(tLabel)} \u00b7 ${escapeHtml(snap.meta?.name||'')}</div>
+    <div class="hd-rename"><input type="text" id="hexRenameInput" value="${escapeAttr(hex.name)}"><button class="btn ghost small" data-action="hex-rename">Rename</button></div>
+    <div class="hd-section"><div class="hd-section-label">Known NPCs here</div>${npcsHere.length?npcsHere.map(n=>`<div class="hd-link">${escapeHtml(n.name)} \u2014 ${escapeHtml(n.profession)}</div>`).join(''):'<div class="hd-empty">No one recorded here yet.</div>'}</div>
+    <div class="hd-section"><div class="hd-section-label">Quests tied here</div>${questsHere.length?questsHere.map(q=>`<div class="hd-link">${escapeHtml(q.title)} <span class="pill ${q.status}" style="margin-left:4px;">${q.status}</span></div>`).join(''):'<div class="hd-empty">Nothing tracked here yet.</div>'}</div>
   `;
 }
 
-/* =========================================================
-   TENSION
-   ========================================================= */
+/* ==========================================================
+   TENSION  (global value, per-map modifier)
+   ========================================================== */
 function tensionDescription(v){
-  if(v < 20) return 'Calm. A complication is unlikely right now.';
-  if(v < 45) return 'Settling unease. Worth staying alert.';
-  if(v < 70) return 'Something is overdue. Tension is building.';
+  if(v<20) return 'Calm. A complication is unlikely right now.';
+  if(v<45) return 'Settling unease. Worth staying alert.';
+  if(v<70) return 'Something is overdue. Tension is building.';
   return 'On edge. A complication is close to certain.';
 }
+function freqLabelFor(v){ return v<=9?'Rare':v<=17?'Average':'Frequent'; }
+function tensionDefaults(){ return content.tensionDefaults||{startingValue:12,step:12,bleedTo:8,ceiling:95}; }
 
 function renderTension(){
-  document.getElementById('tensionVal').textContent = Math.round(state.tension);
-  document.getElementById('tensionDesc').textContent = tensionDescription(state.tension);
-  const arcLen = 157;
-  const filled = (state.tension/100) * arcLen;
-  document.getElementById('dialArc').setAttribute('stroke-dasharray', `${filled} ${arcLen}`);
-  const angle = (state.tension/100) * 180;
-  document.getElementById('dialNeedle').setAttribute('transform', `rotate(${angle-90} 60 70)`);
-}
-
-function freqLabelFor(v){
-  if(v <= 9) return 'Rare';
-  if(v <= 17) return 'Average';
-  return 'Frequent';
-}
-
-function tensionDefaults(){
-  return content.tensionDefaults || { startingValue:12, step:12, bleedTo:8, ceiling:95 };
+  const v=Math.round(state.tension.value);
+  const modifier=activeSnap().tensionModifier??1.0;
+  document.getElementById('tensionVal').textContent=v;
+  document.getElementById('tensionDesc').textContent=tensionDescription(v);
+  const modEl=document.getElementById('tensionModifier');
+  modEl.textContent=modifier!==1.0?`\u00d7${modifier.toFixed(1)} in this location`:'';
+  modEl.style.display=modifier!==1.0?'':'none';
+  const filled=(v/100)*157;
+  document.getElementById('dialArc').setAttribute('stroke-dasharray',`${filled} 157`);
+  document.getElementById('dialNeedle').setAttribute('transform',`rotate(${(v/100)*180-90} 60 70)`);
 }
 
 function advanceTension(reason){
-  const td = tensionDefaults();
-  state.tension = Math.min(td.ceiling, state.tension + state.step);
+  const td=tensionDefaults();
+  const modifier=activeSnap().tensionModifier??1.0;
+  const step=Math.round(state.tension.step*modifier);
+  state.tension.value=Math.min(td.ceiling,state.tension.value+step);
   renderTension();
   checkTension(reason);
 }
 
 function checkTension(reason){
-  const td = tensionDefaults();
-  const roll = Math.random()*100;
-  if(roll <= state.tension){
-    const pool = content.complications && content.complications.length ? content.complications : DEFAULT_SETTING_TEMPLATE.complications;
-    const prompt = pool[Math.floor(Math.random()*pool.length)];
-    state.pending.push(prompt);
-    state.tension = td.bleedTo;
+  const td=tensionDefaults();
+  if(Math.random()*100<=state.tension.value){
+    const pool=content.complications?.length?content.complications:DEFAULT_SETTING_TEMPLATE.complications;
+    state.tension.pending.push(pool[Math.floor(Math.random()*pool.length)]);
+    state.tension.value=td.bleedTo;
   }
-  renderTension();
-  renderPending();
+  renderTension(); renderPending();
 }
 
 function renderPending(){
-  const el = document.getElementById('pendingIndicator');
-  const n = state.pending.length;
-  if(n === 0){
-    el.textContent = 'No complications pending.';
-    el.classList.remove('ready');
-  } else {
-    el.textContent = `${n} complication${n>1?'s':''} ready \u2014 they\u2019ll surface in your next generated event.`;
-    el.classList.add('ready');
-  }
+  const el=document.getElementById('pendingIndicator');
+  const n=state.tension.pending.length;
+  if(!n){ el.textContent='No complications pending.'; el.classList.remove('ready'); }
+  else  { el.textContent=`${n} complication${n>1?'s':''} ready \u2014 they\u2019ll surface in your next generated event.`; el.classList.add('ready'); }
 }
 
-function addLog(tag, text){
-  state.log.unshift({tag, text, t:Date.now()});
-  renderLog();
-}
-
+function addLog(tag,text){ state.log.unshift({tag,text,t:Date.now()}); renderLog(); }
 function renderLog(){
-  const el = document.getElementById('eventLog');
-  if(state.log.length===0){
-    el.innerHTML = '<div class="log-empty">Nothing has happened yet.</div>';
-    return;
-  }
-  el.innerHTML = state.log.slice(0,30).map(e=>
-    `<div class="log-entry"><span class="tag">${escapeHtml(e.tag)}</span>${escapeHtml(e.text)}</div>`
-  ).join('');
+  const el=document.getElementById('eventLog');
+  if(!state.log.length){ el.innerHTML='<div class="log-empty">Nothing has happened yet.</div>'; return; }
+  el.innerHTML=state.log.slice(0,30).map(e=>`<div class="log-entry"><span class="tag">${escapeHtml(e.tag)}</span>${escapeHtml(e.text)}</div>`).join('');
 }
 
-/* =========================================================
-   EVENT / ENCOUNTER GENERATOR
-   ========================================================= */
+/* ==========================================================
+   EVENT / ENCOUNTER — three-tier pool merge
+   1. setting genericEncounters (always)
+   2. map encounterTables.generic (always, for active map)
+   3. map encounterTables[hex.terrain] (terrain-specific)
+   ========================================================== */
 function generateEvent(){
-  const hex = state.hexes.get(hexKey(state.current.q, state.current.r));
-  const tables = content.encounterTables || {};
-  const terrainPool = tables[hex.terrain] || [];
-  const pool = [...(tables.generic || []), ...terrainPool];
-  if(pool.length === 0){
-    showError('Cannot generate an event', ['The active setting template has no encounter entries (not even a "generic" table). Load a valid template or use the default.']);
-    return;
-  }
-  const enc = pool[Math.floor(Math.random()*pool.length)];
-
-  const complications = state.pending.slice();
-  state.pending = [];
+  const map=activeMap();
+  if(!map){ showError('No active map','[No map is loaded yet.]'); return; }
+  const hex=map.hexes.get(hexKey(map.current.q,map.current.r));
+  const tables=activeSnap().encounterTables||{};
+  const pool=[
+    ...(content.genericEncounters||[]),
+    ...(tables.generic||[]),
+    ...(tables[hex.terrain]||[])
+  ].filter(e=>e&&typeof e.text==='string');
+  if(!pool.length){ showError('Cannot generate an event',['The active setting and map template have no encounter entries. Load a valid template or use the default.']); return; }
+  const enc=pool[Math.floor(Math.random()*pool.length)];
+  const complications=state.tension.pending.slice();
+  state.tension.pending=[];
   renderPending();
-
-  renderEventResult(hex, enc, complications);
-
-  const terrainLabel = (content.terrain[hex.terrain] && content.terrain[hex.terrain].label) || hex.terrain;
-  addLog('ENCOUNTER', `${terrainLabel} (${hex.name}) \u2014 ${enc.text}`);
-  complications.forEach(c => addLog('COMPLICATION', c));
-}
-
-function renderEventResult(hex, enc, complications){
-  const el = document.getElementById('eventResult');
-  const terrainLabel = (content.terrain[hex.terrain] && content.terrain[hex.terrain].label) || hex.terrain;
-  el.innerHTML = `
+  const tLabel=activeSnap().terrain?.[hex.terrain]?.label||hex.terrain;
+  document.getElementById('eventResult').innerHTML=`
     <div class="event-card">
       <div class="event-card-head">
-        <span class="pill" style="border-color:var(--brass); background:var(--brass); color:#fff;">${escapeHtml(enc.tag||'Event')}</span>
-        <span class="card-sub">${escapeHtml(hex.name)} \u00b7 ${escapeHtml(terrainLabel)}</span>
+        <span class="pill" style="border-color:var(--brass);background:var(--brass);color:#fff;">${escapeHtml(enc.tag||'Event')}</span>
+        <span class="card-sub">${escapeHtml(hex.name)} \u00b7 ${escapeHtml(tLabel)}</span>
       </div>
       <div class="event-card-body">${escapeHtml(enc.text)}</div>
-      ${complications.length ? `
-        <div class="event-complications">
-          <div class="hd-section-label" style="color:var(--rust);">Complication${complications.length>1?'s':''} surfaced</div>
-          ${complications.map(c=>`<div class="complication-line">${escapeHtml(c)}</div>`).join('')}
-        </div>
-      ` : `<div class="event-clear">No complications brewing right now.</div>`}
-    </div>
-  `;
+      ${complications.length?`<div class="event-complications"><div class="hd-section-label" style="color:var(--rust);">Complication${complications.length>1?'s':''} surfaced</div>${complications.map(c=>`<div class="complication-line">${escapeHtml(c)}</div>`).join('')}</div>`:'<div class="event-clear">No complications brewing right now.</div>'}
+    </div>`;
+  addLog('ENCOUNTER',`${tLabel} (${hex.name}) \u2014 ${enc.text}`);
+  complications.forEach(c=>addLog('COMPLICATION',c));
 }
 
-/* =========================================================
+/* ==========================================================
    NPC GENERATOR
-   ========================================================= */
-let draftNpc = null;
+   Location is now { mapId, hexId } | null, shown as
+   optgroup-grouped <select>.
+   ========================================================== */
+let draftNpc=null, editingNpcId=null;
+
+function parseLocVal(v){ if(!v) return null; const [m,h]=v.split('|'); return m&&h?{mapId:m,hexId:h}:null; }
+function locVal(loc){ return loc?.mapId&&loc?.hexId?`${loc.mapId}|${loc.hexId}`:''; }
+
+function mapHexSelectOptions(selMapId,selHexId){
+  let opts=`<option value="">\u2014 none \u2014</option>`;
+  for(const m of state.maps){
+    const hexes=[...m.hexes.values()].filter(h=>h.explored&&h.name);
+    if(!hexes.length) continue;
+    opts+=`<optgroup label="${escapeAttr(m.templateSnapshot?.meta?.name||m.id)}">`;
+    for(const h of hexes){
+      const sel=m.id===selMapId&&h.id===selHexId?'selected':'';
+      opts+=`<option value="${escapeAttr(m.id+'|'+h.id)}" ${sel}>${escapeHtml(h.name)}</option>`;
+    }
+    opts+='</optgroup>';
+  }
+  return opts;
+}
+
+function npcLocationName(n){
+  if(!n.location?.mapId) return '';
+  const m=state.maps.find(x=>x.id===n.location.mapId);
+  const h=m?.hexes.get(n.location.hexId);
+  if(!h) return '';
+  const mName=m.templateSnapshot?.meta?.name||m.id;
+  return state.maps.length>1?`${escapeHtml(h.name)} (${escapeHtml(mName)})`:escapeHtml(h.name);
+}
 
 function rollNpc(){
-  const pools = content.namePools || {};
-  if(!(pools.npcFirstNames||[]).length || !(pools.npcSurnames||[]).length || !(pools.professions||[]).length || !(pools.traits||[]).length){
-    showError('Cannot generate an NPC', ['The active setting template is missing one of: namePools.npcFirstNames, npcSurnames, professions, or traits.']);
-    return;
+  const pools=content.namePools||{};
+  if(!(pools.npcFirstNames||[]).length||!(pools.npcSurnames||[]).length||!(pools.professions||[]).length||!(pools.traits||[]).length){
+    showError('Cannot generate an NPC',['The active setting template is missing required namePools fields.']); return;
   }
-  draftNpc = {
-    id: 'npc_'+Math.random().toString(36).slice(2,9),
-    name: pools.npcFirstNames[Math.floor(Math.random()*pools.npcFirstNames.length)] + ' ' + pools.npcSurnames[Math.floor(Math.random()*pools.npcSurnames.length)],
-    profession: pools.professions[Math.floor(Math.random()*pools.professions.length)],
-    trait: pools.traits[Math.floor(Math.random()*pools.traits.length)],
-    locationHexId: null,
-    notes: '',
-    tags: [],
-    imageRef: null
+  draftNpc={
+    id:'npc_'+Math.random().toString(36).slice(2,9),
+    name:pools.npcFirstNames[Math.floor(Math.random()*pools.npcFirstNames.length)]+' '+pools.npcSurnames[Math.floor(Math.random()*pools.npcSurnames.length)],
+    profession:pools.professions[Math.floor(Math.random()*pools.professions.length)],
+    trait:pools.traits[Math.floor(Math.random()*pools.traits.length)],
+    location:null, notes:'', tags:[], imageRef:null
   };
   renderDraft();
 }
 
-function exploredHexes(){
-  return [...state.hexes.values()].filter(h=>h.explored);
-}
-function hexSelectOptions(selectedId){
-  const hexes = exploredHexes();
-  let opts = `<option value="">\u2014 none \u2014</option>`;
-  opts += hexes.map(h=>`<option value="${h.id}" ${h.id===selectedId?'selected':''}>${escapeHtml(h.name)}</option>`).join('');
-  return opts;
-}
-
 function renderDraft(){
-  const el = document.getElementById('npcDraft');
+  const el=document.getElementById('npcDraft');
   if(!draftNpc){ el.innerHTML=''; return; }
-  /* Buttons use data-action; the delegated listener on #npcDraft handles them. */
-  el.innerHTML = `
+  el.innerHTML=`
     <div class="card">
-      <div class="card-head">
-        <div>
-          <div class="card-title">${escapeHtml(draftNpc.name)}</div>
-          <div class="card-sub">${escapeHtml(draftNpc.profession)}</div>
-        </div>
-      </div>
+      <div class="card-head"><div><div class="card-title">${escapeHtml(draftNpc.name)}</div><div class="card-sub">${escapeHtml(draftNpc.profession)}</div></div></div>
       <div class="card-body">Quirk: ${escapeHtml(draftNpc.trait)}</div>
-      <div class="field" style="margin-top:8px;">
-        <label>Location</label>
-        <select id="draftLocation">${hexSelectOptions(draftNpc.locationHexId)}</select>
-      </div>
-      <div class="field">
-        <label>Tags (comma separated, e.g. merchant, quest target)</label>
-        <input type="text" id="draftTags" placeholder="merchant, ally...">
-      </div>
-      <div class="field">
-        <label>Notes</label>
-        <textarea id="draftNotes" placeholder="Anything worth remembering..."></textarea>
-      </div>
-      <div class="field">
-        <label>Image URL (optional)</label>
-        <input type="url" id="draftImageUrl" placeholder="https://...">
-        <div class="hint">Or upload a local file below \u2014 whichever you set last is used.</div>
-      </div>
-      <div class="field">
-        <label>Upload local image (optional)</label>
-        <input type="file" id="draftImage" accept="image/*">
-      </div>
+      <div class="field" style="margin-top:8px;"><label>Location</label><select id="draftLocation">${mapHexSelectOptions(null,null)}</select></div>
+      <div class="field"><label>Tags (comma separated)</label><input type="text" id="draftTags" placeholder="merchant, ally..."></div>
+      <div class="field"><label>Notes</label><textarea id="draftNotes" placeholder="Anything worth remembering..."></textarea></div>
+      <div class="field"><label>Image URL (optional)</label><input type="url" id="draftImageUrl" placeholder="https://..."><div class="hint">Or upload a local file below.</div></div>
+      <div class="field"><label>Upload local image</label><input type="file" id="draftImage" accept="image/*"></div>
       <div class="card-actions">
         <button class="btn primary small" data-action="npc-save-draft">Save to Roster</button>
         <button class="btn ghost small"   data-action="npc-reroll">Reroll</button>
         <button class="btn ghost small"   data-action="npc-discard">Discard</button>
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
 function saveDraftNpc(){
-  draftNpc.locationHexId = document.getElementById('draftLocation').value || null;
-  draftNpc.tags = document.getElementById('draftTags').value.split(',').map(t=>t.trim()).filter(Boolean);
-  draftNpc.notes = document.getElementById('draftNotes').value.trim();
-  const url = document.getElementById('draftImageUrl').value.trim();
-  if(url) draftNpc.imageRef = { type:'url', value:url };
+  draftNpc.location=parseLocVal(document.getElementById('draftLocation').value);
+  draftNpc.tags=document.getElementById('draftTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  draftNpc.notes=document.getElementById('draftNotes').value.trim();
+  const url=document.getElementById('draftImageUrl').value.trim();
+  if(url) draftNpc.imageRef={type:'url',value:url};
   state.npcs.unshift(draftNpc);
-  draftNpc = null;
-  renderDraft();
-  renderRoster();
+  draftNpc=null; renderDraft(); renderRoster();
 }
-
-let editingNpcId = null;
 
 function renderRoster(){
-  const el = document.getElementById('npcRoster');
-  if(state.npcs.length===0){
-    el.innerHTML = '<div class="empty-state">No one\'s been recorded yet. Generate an NPC, then save them to the roster.</div>';
-    return;
-  }
-  /* Pure markup render — all interaction handled by the delegated
-     click/change listeners registered once on #npcRoster / #tab-npcs. */
-  el.innerHTML = state.npcs.map(n => n.id === editingNpcId ? npcEditMarkup(n) : npcCardMarkup(n)).join('');
-}
-
-function npcLocationName(n){
-  if(!n.locationHexId) return '';
-  const h = state.hexes.get(n.locationHexId);
-  return h ? h.name : '';
+  const el=document.getElementById('npcRoster');
+  if(!state.npcs.length){ el.innerHTML='<div class="empty-state">No one recorded yet.</div>'; return; }
+  el.innerHTML=state.npcs.map(n=>n.id===editingNpcId?npcEditMarkup(n):npcCardMarkup(n)).join('');
 }
 
 function npcCardMarkup(n){
-  const locName = npcLocationName(n);
-  const img = n.imageRef && n.imageRef.value;
-  return `
-    <div class="card">
-      <div class="card-head">
-        <div style="display:flex; gap:9px; align-items:flex-start;">
-          ${img ? `<img class="thumb" src="${escapeAttr(img)}">` : `<div class="thumb" style="display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;color:var(--brass-deep);">${escapeHtml(n.name.charAt(0))}</div>`}
-          <div>
-            <div class="card-title">${escapeHtml(n.name)}</div>
-            <div class="card-sub">${escapeHtml(n.profession)}${locName ? ' \u00b7 '+escapeHtml(locName) : ''}</div>
-          </div>
-        </div>
-        <div class="card-actions" style="margin-top:0;">
-          <button class="btn ghost small" data-action="npc-edit"   data-npc-id="${n.id}">Edit</button>
-          <button class="btn ghost small" data-action="npc-remove" data-npc-id="${n.id}">Remove</button>
-        </div>
+  const img=n.imageRef?.value;
+  const locStr=npcLocationName(n);
+  return `<div class="card">
+    <div class="card-head">
+      <div style="display:flex;gap:9px;align-items:flex-start;">
+        ${img?`<img class="thumb" src="${escapeAttr(img)}">`:`<div class="thumb" style="display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;color:var(--brass-deep);">${escapeHtml(n.name.charAt(0))}</div>`}
+        <div><div class="card-title">${escapeHtml(n.name)}</div><div class="card-sub">${escapeHtml(n.profession)}${locStr?' \u00b7 '+locStr:''}</div></div>
       </div>
-      ${n.tags && n.tags.length ? `<div style="margin-top:7px;">${n.tags.map(t=>`<span class="pill" style="margin-right:4px;">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
-      <div class="card-body">${escapeHtml(n.trait)}${n.notes ? '<br>'+escapeHtml(n.notes) : ''}</div>
+      <div class="card-actions" style="margin-top:0;">
+        <button class="btn ghost small" data-action="npc-edit"   data-npc-id="${n.id}">Edit</button>
+        <button class="btn ghost small" data-action="npc-remove" data-npc-id="${n.id}">Remove</button>
+      </div>
     </div>
-  `;
+    ${n.tags?.length?`<div style="margin-top:7px;">${n.tags.map(t=>`<span class="pill" style="margin-right:4px;">${escapeHtml(t)}</span>`).join('')}</div>`:''}
+    <div class="card-body">${escapeHtml(n.trait)}${n.notes?'<br>'+escapeHtml(n.notes):''}</div>
+  </div>`;
 }
 
 function npcEditMarkup(n){
-  return `
-    <div class="card">
-      <div class="field">
-        <label>Name</label>
-        <input type="text" id="editName" value="${escapeAttr(n.name)}">
-      </div>
-      <div class="row">
-        <div class="field">
-          <label>Profession</label>
-          <input type="text" id="editProfession" value="${escapeAttr(n.profession)}">
-        </div>
-        <div class="field">
-          <label>Quirk</label>
-          <input type="text" id="editTrait" value="${escapeAttr(n.trait)}">
-        </div>
-      </div>
-      <div class="field">
-        <label>Location</label>
-        <select id="editLocation">${hexSelectOptions(n.locationHexId)}</select>
-      </div>
-      <div class="field">
-        <label>Tags (comma separated, e.g. merchant, quest target)</label>
-        <input type="text" id="editTags" value="${escapeAttr((n.tags||[]).join(', '))}">
-      </div>
-      <div class="field">
-        <label>Notes</label>
-        <textarea id="editNotes">${escapeHtml(n.notes||'')}</textarea>
-      </div>
-      <div class="field">
-        <label>Image URL</label>
-        <input type="url" id="editImageUrl" value="${escapeAttr(n.imageRef && n.imageRef.type==='url' ? n.imageRef.value : '')}" placeholder="https://...">
-      </div>
-      <div class="field">
-        <label>Replace with local upload (optional)</label>
-        <input type="file" id="editImage" accept="image/*">
-      </div>
-      <div class="card-actions">
-        <button class="btn primary small" data-action="npc-save-edit"   data-npc-id="${n.id}">Save Changes</button>
-        <button class="btn ghost small"   data-action="npc-cancel-edit" data-npc-id="${n.id}">Cancel</button>
-      </div>
+  return `<div class="card">
+    <div class="field"><label>Name</label><input type="text" id="editName" value="${escapeAttr(n.name)}"></div>
+    <div class="row">
+      <div class="field"><label>Profession</label><input type="text" id="editProfession" value="${escapeAttr(n.profession)}"></div>
+      <div class="field"><label>Quirk</label><input type="text" id="editTrait" value="${escapeAttr(n.trait)}"></div>
     </div>
-  `;
+    <div class="field"><label>Location</label><select id="editLocation">${mapHexSelectOptions(n.location?.mapId,n.location?.hexId)}</select></div>
+    <div class="field"><label>Tags (comma separated)</label><input type="text" id="editTags" value="${escapeAttr((n.tags||[]).join(', '))}"></div>
+    <div class="field"><label>Notes</label><textarea id="editNotes">${escapeHtml(n.notes||'')}</textarea></div>
+    <div class="field"><label>Image URL</label><input type="url" id="editImageUrl" value="${escapeAttr(n.imageRef?.type==='url'?n.imageRef.value:'')}" placeholder="https://..."></div>
+    <div class="field"><label>Replace with local upload</label><input type="file" id="editImage" accept="image/*"></div>
+    <div class="card-actions">
+      <button class="btn primary small" data-action="npc-save-edit"   data-npc-id="${n.id}">Save Changes</button>
+      <button class="btn ghost small"   data-action="npc-cancel-edit" data-npc-id="${n.id}">Cancel</button>
+    </div>
+  </div>`;
 }
 
 function saveEditNpc(id){
-  const n = state.npcs.find(x=>x.id===id);
-  if(!n) return;
-  const name = document.getElementById('editName').value.trim();
-  n.name = name || n.name;
-  n.profession = document.getElementById('editProfession').value.trim();
-  n.trait = document.getElementById('editTrait').value.trim();
-  n.locationHexId = document.getElementById('editLocation').value || null;
-  n.tags = document.getElementById('editTags').value.split(',').map(t=>t.trim()).filter(Boolean);
-  n.notes = document.getElementById('editNotes').value.trim();
-  const url = document.getElementById('editImageUrl').value.trim();
-  if(url) n.imageRef = { type:'url', value:url };
-  editingNpcId = null;
-  renderRoster();
+  const n=state.npcs.find(x=>x.id===id); if(!n) return;
+  n.name=document.getElementById('editName').value.trim()||n.name;
+  n.profession=document.getElementById('editProfession').value.trim();
+  n.trait=document.getElementById('editTrait').value.trim();
+  n.location=parseLocVal(document.getElementById('editLocation').value);
+  n.tags=document.getElementById('editTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  n.notes=document.getElementById('editNotes').value.trim();
+  const url=document.getElementById('editImageUrl').value.trim();
+  if(url) n.imageRef={type:'url',value:url};
+  editingNpcId=null; renderRoster();
 }
 
-function escapeHtml(str){
-  const d = document.createElement('div');
-  d.textContent = str == null ? '' : String(str);
-  return d.innerHTML;
-}
-function escapeAttr(str){ return escapeHtml(str).replace(/"/g,'&quot;'); }
-
-/* =========================================================
+/* ==========================================================
    QUEST GENERATOR / TRACKER
-   ========================================================= */
+   ========================================================== */
 function rollQuest(){
-  const qt = content.questTemplates || {};
-  if(!(qt.verbs||[]).length || !(qt.items||[]).length){
-    showError('Cannot generate a quest', ['The active setting template is missing questTemplates.verbs or questTemplates.items.']);
-    return;
-  }
-  const verb = qt.verbs[Math.floor(Math.random()*qt.verbs.length)];
-  const item = qt.items[Math.floor(Math.random()*qt.items.length)];
-  const npcPool = state.npcs.length ? state.npcs : null;
-  const npc = npcPool ? npcPool[Math.floor(Math.random()*npcPool.length)] : null;
-  const hexPool = exploredHexes();
-  const hex = hexPool.length ? hexPool[Math.floor(Math.random()*hexPool.length)] : null;
-  const placeName = hex ? hex.name : 'a place not yet found';
-
-  const who = npc ? npc.name : 'Someone unnamed';
-  const hook = `${who} wants you to ${verb} ${item}, last known to be near ${placeName}.`;
-
+  const qt=content.questTemplates||{};
+  if(!(qt.verbs||[]).length||!(qt.items||[]).length){ showError('Cannot generate a quest',['The active setting template is missing questTemplates.verbs or questTemplates.items.']); return; }
+  const verb=qt.verbs[Math.floor(Math.random()*qt.verbs.length)];
+  const item=qt.items[Math.floor(Math.random()*qt.items.length)];
+  const npc=state.npcs.length?state.npcs[Math.floor(Math.random()*state.npcs.length)]:null;
+  // Pick from explored hexes across all maps
+  const allHexes=[];
+  for(const m of state.maps) for(const h of m.hexes.values()) if(h.explored&&h.name) allHexes.push({m,h});
+  const pick=allHexes.length?allHexes[Math.floor(Math.random()*allHexes.length)]:null;
+  const location=pick?{mapId:pick.m.id,hexId:pick.h.id}:null;
+  const placeName=pick?pick.h.name:'a place not yet found';
   state.quests.unshift({
-    id: 'q_'+Math.random().toString(36).slice(2,9),
-    title: item.charAt(0).toUpperCase()+item.slice(1),
-    hook,
-    status: 'active',
-    npcId: npc ? npc.id : null,
-    locationHexId: hex ? hex.id : null
+    id:'q_'+Math.random().toString(36).slice(2,9),
+    title:item.charAt(0).toUpperCase()+item.slice(1),
+    hook:`${npc?npc.name:'Someone unnamed'} wants you to ${verb} ${item}, last known near ${placeName}.`,
+    status:'active', npcId:npc?.id||null, location
   });
   renderQuests();
 }
 
 function questPlaceName(q){
-  if(!q.locationHexId) return 'an unknown location';
-  const h = state.hexes.get(q.locationHexId);
-  return h ? h.name : 'an unknown location';
+  if(!q.location?.mapId) return 'unknown location';
+  const m=state.maps.find(x=>x.id===q.location.mapId);
+  const h=m?.hexes.get(q.location.hexId);
+  if(!h) return 'unknown location';
+  return state.maps.length>1?`${h.name} (${m.templateSnapshot?.meta?.name||m.id})`:h.name;
 }
 
 function renderQuests(){
-  const el = document.getElementById('questList');
-  if(state.quests.length===0){
-    el.innerHTML = '<div class="empty-state">No quests yet. Generate a hook to get started.</div>';
-    return;
-  }
-  /* Pure markup — delegated listener on #questList handles all clicks. */
-  el.innerHTML = state.quests.map(q=>`
+  const el=document.getElementById('questList');
+  if(!state.quests.length){ el.innerHTML='<div class="empty-state">No quests yet.</div>'; return; }
+  el.innerHTML=state.quests.map(q=>`
     <div class="card">
       <div class="card-head">
-        <div>
-          <div class="card-title">${escapeHtml(q.title)}</div>
-          <div class="card-sub">${escapeHtml(questPlaceName(q))}</div>
-        </div>
+        <div><div class="card-title">${escapeHtml(q.title)}</div><div class="card-sub">${escapeHtml(questPlaceName(q))}</div></div>
         <span class="pill ${q.status}">${q.status}</span>
       </div>
       <div class="card-body">${escapeHtml(q.hook)}</div>
       <div class="card-actions">
-        ${q.status!=='active' ? `<button class="btn ghost small" data-action="quest-status" data-quest-id="${q.id}" data-status="active">Mark Active</button>` : ''}
-        ${q.status!=='done'   ? `<button class="btn ghost small" data-action="quest-status" data-quest-id="${q.id}" data-status="done">Mark Complete</button>` : ''}
-        ${q.status!=='failed' ? `<button class="btn ghost small" data-action="quest-status" data-quest-id="${q.id}" data-status="failed">Mark Failed</button>` : ''}
+        ${q.status!=='active' ?`<button class="btn ghost small" data-action="quest-status" data-quest-id="${q.id}" data-status="active">Mark Active</button>`:''}
+        ${q.status!=='done'   ?`<button class="btn ghost small" data-action="quest-status" data-quest-id="${q.id}" data-status="done">Mark Complete</button>`:''}
+        ${q.status!=='failed' ?`<button class="btn ghost small" data-action="quest-status" data-quest-id="${q.id}" data-status="failed">Mark Failed</button>`:''}
         <button class="btn ghost small" data-action="quest-remove" data-quest-id="${q.id}">Remove</button>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-/* =========================================================
+/* ==========================================================
    VALIDATION — human-readable, never throws
-   ========================================================= */
-function isNonEmptyArray(v){ return Array.isArray(v) && v.length > 0; }
-function isPlainObject(v){ return v !== null && typeof v === 'object' && !Array.isArray(v); }
-function isNonEmptyStringArray(v){ return isNonEmptyArray(v) && v.every(x => typeof x === 'string' && x.trim().length > 0); }
+   ========================================================== */
+function isNonEmptyArray(v){ return Array.isArray(v)&&v.length>0; }
+function isPlainObject(v){ return v!==null&&typeof v==='object'&&!Array.isArray(v); }
+function isNonEmptyStringArray(v){ return isNonEmptyArray(v)&&v.every(x=>typeof x==='string'&&x.trim().length>0); }
 
 function validateSettingTemplate(obj){
-  const errors = [];
-  if(!isPlainObject(obj)){ return { valid:false, errors:['The file does not contain a JSON object at its root.'] }; }
-
-  if(!isPlainObject(obj.terrain) || Object.keys(obj.terrain).length === 0){
-    errors.push('"terrain" is missing or empty. It must be an object mapping terrain keys (e.g. "forest") to { label, color, weight }.');
-  } else {
-    for(const [key, t] of Object.entries(obj.terrain)){
-      if(!isPlainObject(t)) { errors.push(`terrain.${key} must be an object.`); continue; }
-      if(typeof t.label !== 'string' || !t.label.trim()) errors.push(`terrain.${key}.label must be a non-empty string.`);
-      if(typeof t.color !== 'string' || !t.color.trim()) errors.push(`terrain.${key}.color must be a non-empty string (e.g. a hex color).`);
-      if(typeof t.weight !== 'number' || !(t.weight > 0)) errors.push(`terrain.${key}.weight must be a positive number.`);
+  const e=[];
+  if(!isPlainObject(obj)) return {valid:false,errors:['File does not contain a JSON object at its root.']};
+  if(!isPlainObject(obj.namePools)) e.push('"namePools" is missing.');
+  else {
+    for(const f of ['npcFirstNames','npcSurnames','professions','traits'])
+      if(!isNonEmptyStringArray(obj.namePools[f])) e.push(`namePools.${f} must be a non-empty array of strings.`);
+    for(const f of ['settlementNames','ruinNames'])
+      if(obj.namePools[f]!==undefined&&!isNonEmptyStringArray(obj.namePools[f])) e.push(`namePools.${f}, if present, must be a non-empty array of strings.`);
+  }
+  if(!isPlainObject(obj.questTemplates)) e.push('"questTemplates" with "verbs" and "items" arrays is missing.');
+  else {
+    if(!isNonEmptyStringArray(obj.questTemplates.verbs)) e.push('questTemplates.verbs must be a non-empty array of strings.');
+    if(!isNonEmptyStringArray(obj.questTemplates.items)) e.push('questTemplates.items must be a non-empty array of strings.');
+  }
+  if(!isNonEmptyStringArray(obj.complications)) e.push('"complications" must be a non-empty array of strings.');
+  if(obj.genericEncounters!==undefined){
+    if(!Array.isArray(obj.genericEncounters)) e.push('"genericEncounters", if present, must be an array of {tag?,text} objects.');
+    else obj.genericEncounters.forEach((en,i)=>{ if(!isPlainObject(en)||typeof en.text!=='string'||!en.text.trim()) e.push(`genericEncounters[${i}] must have a non-empty "text" string.`); });
+  }
+  if(obj.tensionDefaults!==undefined){
+    if(!isPlainObject(obj.tensionDefaults)) e.push('"tensionDefaults" must be an object.');
+    else for(const f of ['startingValue','step','bleedTo','ceiling']){
+      const v=obj.tensionDefaults[f];
+      if(v!==undefined&&(typeof v!=='number'||v<0||v>100)) e.push(`tensionDefaults.${f} must be a number 0-100.`);
     }
   }
-
-  if(!isPlainObject(obj.namePools)){
-    errors.push('"namePools" is missing. It must include npcFirstNames, npcSurnames, professions, and traits as non-empty arrays of strings.');
-  } else {
-    for(const field of ['npcFirstNames','npcSurnames','professions','traits']){
-      if(!isNonEmptyStringArray(obj.namePools[field])) errors.push(`namePools.${field} must be a non-empty array of strings.`);
-    }
-    for(const field of ['settlementNames','ruinNames']){
-      if(obj.namePools[field] !== undefined && !isNonEmptyStringArray(obj.namePools[field])) errors.push(`namePools.${field}, if present, must be a non-empty array of strings.`);
-    }
-  }
-
-  if(!isPlainObject(obj.questTemplates)){
-    errors.push('"questTemplates" is missing. It must include "verbs" and "items" as non-empty arrays of strings.');
-  } else {
-    if(!isNonEmptyStringArray(obj.questTemplates.verbs)) errors.push('questTemplates.verbs must be a non-empty array of strings.');
-    if(!isNonEmptyStringArray(obj.questTemplates.items)) errors.push('questTemplates.items must be a non-empty array of strings.');
-  }
-
-  if(!isNonEmptyStringArray(obj.complications)){
-    errors.push('"complications" must be a non-empty array of strings (these are the oracle prompts used when tension surfaces).');
-  }
-
-  if(!isPlainObject(obj.encounterTables) || !isNonEmptyArray(obj.encounterTables.generic)){
-    errors.push('"encounterTables" must be an object with at least a non-empty "generic" array.');
-  } else {
-    for(const [key, arr] of Object.entries(obj.encounterTables)){
-      if(!Array.isArray(arr)) { errors.push(`encounterTables.${key} must be an array.`); continue; }
-      arr.forEach((entry, i) => {
-        if(!isPlainObject(entry) || typeof entry.text !== 'string' || !entry.text.trim()){
-          errors.push(`encounterTables.${key}[${i}] must be an object with at least a non-empty "text" string.`);
-        }
-      });
-    }
-  }
-
-  if(obj.tensionDefaults !== undefined){
-    if(!isPlainObject(obj.tensionDefaults)){
-      errors.push('"tensionDefaults", if present, must be an object.');
-    } else {
-      for(const field of ['startingValue','step','bleedTo','ceiling']){
-        const v = obj.tensionDefaults[field];
-        if(v !== undefined && (typeof v !== 'number' || v < 0 || v > 100)) errors.push(`tensionDefaults.${field} must be a number between 0 and 100.`);
-      }
-    }
-  }
-
-  return { valid: errors.length === 0, errors };
+  return {valid:e.length===0,errors:e};
 }
 
 function validateMapTemplate(obj){
-  const errors = [];
-  if(!isPlainObject(obj)){ return { valid:false, errors:['The file does not contain a JSON object at its root.'] }; }
-
-  const mode = obj.mode;
-  if(mode !== 'generated' && mode !== 'authored'){
-    errors.push('"mode" must be either "generated" or "authored".');
+  const e=[];
+  if(!isPlainObject(obj)) return {valid:false,errors:['File does not contain a JSON object at its root.']};
+  if(obj.meta!==undefined&&!isPlainObject(obj.meta)) e.push('"meta", if present, must be an object {name,description}.');
+  if(obj.mode!=='generated'&&obj.mode!=='authored') e.push('"mode" must be "generated" or "authored".');
+  if(!isPlainObject(obj.terrain)||!Object.keys(obj.terrain).length)
+    e.push('"terrain" is required in a Map Template and must define at least one type with {label,color,weight}.');
+  else for(const [k,t] of Object.entries(obj.terrain)){
+    if(!isPlainObject(t)){e.push(`terrain.${k} must be an object.`);continue;}
+    if(typeof t.label!=='string'||!t.label.trim()) e.push(`terrain.${k}.label must be a non-empty string.`);
+    if(typeof t.color!=='string'||!t.color.trim()) e.push(`terrain.${k}.color must be a non-empty string.`);
+    if(typeof t.weight!=='number'||!(t.weight>0))  e.push(`terrain.${k}.weight must be a positive number.`);
+    if(t.icon!==undefined&&typeof t.icon!=='string') e.push(`terrain.${k}.icon must be a string (built-in shape name).`);
+    if(t.iconUrl!==undefined&&typeof t.iconUrl!=='string') e.push(`terrain.${k}.iconUrl must be a string URL.`);
   }
-  if(mode === 'generated'){
-    if(obj.radius !== undefined && (typeof obj.radius !== 'number' || obj.radius < 1 || obj.radius > 12)){
-      errors.push('"radius" must be a number between 1 and 12.');
-    }
+  if(!isPlainObject(obj.encounterTables)||!isNonEmptyArray(obj.encounterTables.generic))
+    e.push('"encounterTables" with at least a non-empty "generic" array is required.');
+  else for(const [k,arr] of Object.entries(obj.encounterTables)){
+    if(!Array.isArray(arr)){e.push(`encounterTables.${k} must be an array.`);continue;}
+    arr.forEach((en,i)=>{ if(!isPlainObject(en)||typeof en.text!=='string'||!en.text.trim()) e.push(`encounterTables.${k}[${i}] must have a non-empty "text" string.`); });
   }
-  if(mode === 'authored'){
-    if(!isNonEmptyArray(obj.authoredHexes)){
-      errors.push('mode is "authored" but "authoredHexes" is missing or empty. It must list at least one hex: { q, r, terrain, name?, explored? }.');
-    } else {
-      obj.authoredHexes.forEach((h, i) => {
-        if(!isPlainObject(h) || typeof h.q !== 'number' || typeof h.r !== 'number' || typeof h.terrain !== 'string'){
-          errors.push(`authoredHexes[${i}] must include numeric "q", "r", and a string "terrain".`);
-        }
-      });
-    }
+  if(obj.mode==='generated'&&obj.radius!==undefined&&(typeof obj.radius!=='number'||obj.radius<1||obj.radius>12)) e.push('"radius" must be 1-12.');
+  if(obj.mode==='authored'){
+    if(!isNonEmptyArray(obj.authoredHexes)) e.push('"authoredHexes" must be a non-empty array when mode is "authored".');
+    else obj.authoredHexes.forEach((h,i)=>{ if(!isPlainObject(h)||typeof h.q!=='number'||typeof h.r!=='number'||typeof h.terrain!=='string') e.push(`authoredHexes[${i}] needs numeric q,r and string terrain.`); });
   }
-  if(obj.hexSize !== undefined && (typeof obj.hexSize !== 'number' || obj.hexSize <= 0)){
-    errors.push('"hexSize", if present, must be a positive number.');
-  }
-  if(obj.centerHex !== undefined && !isPlainObject(obj.centerHex)){
-    errors.push('"centerHex", if present, must be an object like { terrain, name, explored }.');
-  }
-
-  return { valid: errors.length === 0, errors };
+  if(obj.hexSize!==undefined&&(typeof obj.hexSize!=='number'||obj.hexSize<=0)) e.push('"hexSize" must be a positive number.');
+  if(obj.centerHex!==undefined&&!isPlainObject(obj.centerHex)) e.push('"centerHex" must be an object {terrain,name,explored}.');
+  if(obj.tensionModifier!==undefined&&(typeof obj.tensionModifier!=='number'||obj.tensionModifier<=0)) e.push('"tensionModifier" must be a positive number (e.g. 1.5 for tenser, 0.5 for calmer).');
+  return {valid:e.length===0,errors:e};
 }
 
 function validateSaveGame(obj){
-  const errors = [];
-  if(!isPlainObject(obj)){ return { valid:false, errors:['The file does not contain a JSON object at its root.'] }; }
-
-  if(!isPlainObject(obj.map)) {
-    errors.push('"map" is missing.');
-  } else {
-    if(!isPlainObject(obj.map.current) || typeof obj.map.current.q !== 'number' || typeof obj.map.current.r !== 'number'){
-      errors.push('map.current must be an object with numeric q and r.');
-    }
-    if(!isNonEmptyArray(obj.map.hexes)){
-      errors.push('map.hexes must be a non-empty array.');
-    } else {
-      obj.map.hexes.slice(0, 5).forEach((h, i) => {
-        if(!isPlainObject(h) || typeof h.q !== 'number' || typeof h.r !== 'number' || typeof h.terrain !== 'string'){
-          errors.push(`map.hexes[${i}] is missing required fields (q, r, terrain).`);
-        }
-      });
-    }
+  const e=[];
+  if(!isPlainObject(obj)) return {valid:false,errors:['File does not contain a JSON object at its root.']};
+  if(obj.schemaVersion===1) return {valid:false,errors:['This is a version 1 save file. The app now uses version 2 and cannot load version 1 saves.']};
+  if(!isNonEmptyArray(obj.maps)) e.push('"maps" must be a non-empty array.');
+  else obj.maps.forEach((m,i)=>{
+    if(!isPlainObject(m)){e.push(`maps[${i}] must be an object.`);return;}
+    if(typeof m.id!=='string'||!m.id.trim()) e.push(`maps[${i}].id must be a non-empty string.`);
+    if(!isPlainObject(m.current)||typeof m.current.q!=='number'||typeof m.current.r!=='number') e.push(`maps[${i}].current must have numeric q and r.`);
+    if(!isNonEmptyArray(m.hexes)) e.push(`maps[${i}].hexes must be a non-empty array.`);
+    if(!isPlainObject(m.templateSnapshot)) e.push(`maps[${i}].templateSnapshot is missing \u2014 this map cannot be restored.`);
+    else { const mc=validateMapTemplate(m.templateSnapshot); if(!mc.valid) e.push(`maps[${i}].templateSnapshot: ${mc.errors.join(' | ')}`); }
+  });
+  if(typeof obj.activeMapId!=='string'||!obj.activeMapId.trim()) e.push('"activeMapId" must be a non-empty string.');
+  else if(isNonEmptyArray(obj.maps)&&!obj.maps.find(m=>m.id===obj.activeMapId)) e.push(`activeMapId "${obj.activeMapId}" does not match any map in the maps array.`);
+  if(!isPlainObject(obj.tension)) e.push('"tension" object is missing.');
+  else {
+    if(typeof obj.tension.value!=='number') e.push('tension.value must be a number.');
+    if(!Array.isArray(obj.tension.pending)) e.push('tension.pending must be an array.');
   }
-
-  if(!isPlainObject(obj.tension)){
-    errors.push('"tension" is missing.');
-  } else {
-    if(typeof obj.tension.value !== 'number') errors.push('tension.value must be a number.');
-    if(!Array.isArray(obj.tension.pending)) errors.push('tension.pending must be an array (can be empty).');
-  }
-
-  if(!Array.isArray(obj.npcs)) errors.push('"npcs" must be an array (can be empty).');
-  if(!Array.isArray(obj.quests)) errors.push('"quests" must be an array (can be empty).');
-  if(!Array.isArray(obj.eventLog)) errors.push('"eventLog" must be an array (can be empty).');
-
-  if(!isPlainObject(obj.contentSnapshot)){
-    errors.push('"contentSnapshot" is missing \u2014 this save does not carry its own copy of the setting content and cannot be safely restored.');
-  } else {
-    const contentCheck = validateSettingTemplate(obj.contentSnapshot);
-    if(!contentCheck.valid){
-      errors.push('The embedded contentSnapshot has problems: ' + contentCheck.errors.join(' | '));
-    }
-  }
-
-  return { valid: errors.length === 0, errors };
+  if(!Array.isArray(obj.npcs))    e.push('"npcs" must be an array.');
+  if(!Array.isArray(obj.quests))  e.push('"quests" must be an array.');
+  if(!Array.isArray(obj.eventLog))e.push('"eventLog" must be an array.');
+  if(!isPlainObject(obj.contentSnapshot)) e.push('"contentSnapshot" is missing.');
+  else { const sc=validateSettingTemplate(obj.contentSnapshot); if(!sc.valid) e.push('contentSnapshot: '+sc.errors.join(' | ')); }
+  return {valid:e.length===0,errors:e};
 }
 
-/* =========================================================
+/* ==========================================================
    ERROR DISPLAY
-   ========================================================= */
-function showError(title, errors){
-  const banner = document.getElementById('globalErrorBanner');
-  document.getElementById('globalErrorTitle').textContent = title;
-  document.getElementById('globalErrorList').innerHTML = errors.map(e=>`<li>${escapeHtml(e)}</li>`).join('');
-  banner.classList.add('visible');
-  banner.scrollIntoView({ behavior:'smooth', block:'start' });
-}
-function hideError(){
-  document.getElementById('globalErrorBanner').classList.remove('visible');
-}
-document.getElementById('globalErrorClose').onclick = hideError;
+   ========================================================== */
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s==null?'':String(s); return d.innerHTML; }
+function escapeAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;'); }
 
-function showInlineErrors(containerId, title, errors){
-  const el = document.getElementById(containerId);
-  if(!errors || errors.length === 0){ el.innerHTML = ''; return; }
-  el.innerHTML = `<div class="error-banner visible"><div class="error-banner-title">${escapeHtml(title)}</div><ul>${errors.map(e=>`<li>${escapeHtml(e)}</li>`).join('')}</ul></div>`;
+function showError(title,errors){
+  document.getElementById('globalErrorTitle').textContent=title;
+  document.getElementById('globalErrorList').innerHTML=errors.map(e=>`<li>${escapeHtml(e)}</li>`).join('');
+  const b=document.getElementById('globalErrorBanner'); b.classList.add('visible'); b.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function hideError(){ document.getElementById('globalErrorBanner').classList.remove('visible'); }
+document.getElementById('globalErrorClose').onclick=hideError;
+
+function showInlineErrors(id,title,errs){
+  const el=document.getElementById(id);
+  if(!errs?.length){ el.innerHTML=''; return; }
+  el.innerHTML=`<div class="error-banner visible"><div class="error-banner-title">${escapeHtml(title)}</div><ul>${errs.map(e=>`<li>${escapeHtml(e)}</li>`).join('')}</ul></div>`;
 }
 
-/* =========================================================
+/* ==========================================================
    FILE HELPERS
-   ========================================================= */
+   ========================================================== */
 function readJsonFile(file){
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const parsed = JSON.parse(reader.result);
-        resolve({ ok:true, data: parsed });
-      } catch(e){
-        resolve({ ok:false, error: `That file isn't valid JSON (${e.message}).` });
-      }
-    };
-    reader.onerror = () => resolve({ ok:false, error: 'The file could not be read from disk.' });
-    reader.readAsText(file);
+  return new Promise(resolve=>{
+    const r=new FileReader();
+    r.onload=()=>{ try{ resolve({ok:true,data:JSON.parse(r.result)}); }catch(e){ resolve({ok:false,error:`Not valid JSON (${e.message}).`}); } };
+    r.onerror=()=>resolve({ok:false,error:'File could not be read from disk.'});
+    r.readAsText(file);
   });
 }
-
-function downloadJson(obj, filename){
-  const blob = new Blob([JSON.stringify(obj, null, 2)], { type:'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+function downloadJson(obj,filename){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}));
+  a.download=filename; document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
 
-/* =========================================================
-   NEW GAME FLOW
-   ========================================================= */
-let pendingSettingTemplate = null;
-let pendingMapTemplate = null;
-
-document.getElementById('btnOpenNewGame').onclick = ()=>{
-  pendingSettingTemplate = null;
-  pendingMapTemplate = null;
-  document.getElementById('settingPickLabel').textContent = 'Default — The Hollow Reach';
-  document.getElementById('mapPickLabel').textContent = 'Default — Generated, radius 4';
-  document.getElementById('newGameErrors').innerHTML = '';
-  document.getElementById('newGameDialog').showModal();
-};
-document.getElementById('btnCancelNewGame').onclick = ()=> document.getElementById('newGameDialog').close();
-
-document.getElementById('btnPickSetting').onclick = ()=> document.getElementById('fileSettingTemplate').click();
-document.getElementById('btnPickMap').onclick = ()=> document.getElementById('fileMapTemplate').click();
-document.getElementById('btnClearSetting').onclick = ()=>{
-  pendingSettingTemplate = null;
-  document.getElementById('settingPickLabel').textContent = 'Default — The Hollow Reach';
-};
-document.getElementById('btnClearMap').onclick = ()=>{
-  pendingMapTemplate = null;
-  document.getElementById('mapPickLabel').textContent = 'Default — Generated, radius 4';
-};
-
-document.getElementById('fileSettingTemplate').addEventListener('change', async (e)=>{
-  const file = e.target.files[0];
-  e.target.value = '';
-  if(!file) return;
-  const result = await readJsonFile(file);
-  if(!result.ok){ showInlineErrors('newGameErrors', 'Setting Template couldn\u2019t be loaded', [result.error]); return; }
-  const check = validateSettingTemplate(result.data);
-  if(!check.valid){ showInlineErrors('newGameErrors', `"${file.name}" isn\u2019t a valid Setting Template`, check.errors); return; }
-  showInlineErrors('newGameErrors', '', []);
-  pendingSettingTemplate = result.data;
-  document.getElementById('settingPickLabel').textContent = (result.data.meta && result.data.meta.name) ? result.data.meta.name : file.name;
-});
-
-document.getElementById('fileMapTemplate').addEventListener('change', async (e)=>{
-  const file = e.target.files[0];
-  e.target.value = '';
-  if(!file) return;
-  const result = await readJsonFile(file);
-  if(!result.ok){ showInlineErrors('newGameErrors', 'Map Template couldn\u2019t be loaded', [result.error]); return; }
-  const check = validateMapTemplate(result.data);
-  if(!check.valid){ showInlineErrors('newGameErrors', `"${file.name}" isn\u2019t a valid Map Template`, check.errors); return; }
-  showInlineErrors('newGameErrors', '', []);
-  pendingMapTemplate = result.data;
-  document.getElementById('mapPickLabel').textContent = `${file.name} \u2014 ${result.data.mode}`;
-});
-
-document.getElementById('btnStartNewGame').onclick = ()=>{
-  content = pendingSettingTemplate ? deepClone(pendingSettingTemplate) : deepClone(DEFAULT_SETTING_TEMPLATE);
-  const mapTpl = pendingMapTemplate ? deepClone(pendingMapTemplate) : deepClone(DEFAULT_MAP_TEMPLATE);
-
-  applyMapTemplate(mapTpl);
-
-  const td = tensionDefaults();
-  state.saveId = 'save_' + Math.random().toString(36).slice(2,10);
-  state.tension = td.startingValue;
-  state.step = 12;
-  state.pending = [];
-  state.npcs = [];
-  state.quests = [];
-  state.log = [];
-  state.provenance = {
-    settingTemplateId: content.templateId || 'custom',
-    settingTemplateVersion: content.templateVersion || 1,
-    mapTemplateId: mapTpl.mapTemplateId || 'custom',
-    mapTemplateVersion: mapTpl.mapTemplateVersion || 1
-  };
-
-  document.getElementById('newGameDialog').close();
-  hideError();
-  renderAll(true);
-};
-
-/* =========================================================
-   LOAD GAME FLOW
-   ========================================================= */
-document.getElementById('btnOpenLoadGame').onclick = ()=> document.getElementById('fileLoadGame').click();
-
-document.getElementById('fileLoadGame').addEventListener('change', async (e)=>{
-  const file = e.target.files[0];
-  e.target.value = '';
-  if(!file) return;
-  const result = await readJsonFile(file);
-  if(!result.ok){ showError('Save file couldn\u2019t be loaded', [result.error]); return; }
-  const check = validateSaveGame(result.data);
-  if(!check.valid){ showError(`"${file.name}" isn\u2019t a valid save file`, check.errors.concat(['Your current game was not changed.'])); return; }
-
-  const data = result.data;
-  hideError();
-
-  content = deepClone(data.contentSnapshot);
-  SIZE = data.map.hexSize || 30;
-  RADIUS = data.map.radius || 4;
-  mapTemplateActive = { mode:'authored', hexSize: SIZE, radius: RADIUS, centerHex:null, authoredHexes: data.map.hexes };
-
-  state.saveId = data.saveId || ('save_' + Math.random().toString(36).slice(2,10));
-  state.hexes = new Map(data.map.hexes.map(h => [h.id || hexKey(h.q,h.r), { id: h.id || hexKey(h.q,h.r), q:h.q, r:h.r, terrain:h.terrain, explored: !!h.explored, name: h.name || null, notes: h.notes || '' }]));
-  state.current = { q: data.map.current.q, r: data.map.current.r };
-  state.tension = data.tension.value;
-  state.step = data.tension.step || 12;
-  state.pending = data.tension.pending || [];
-  state.npcs = (data.npcs || []).map(n => ({ ...n, tags: n.tags || [] }));
-  state.quests = data.quests || [];
-  state.log = (data.eventLog || []).map(e => ({ tag:e.tag, text:e.text, t: e.timestamp ? Date.parse(e.timestamp) : Date.now() }));
-  state.provenance = data.provenance || state.provenance;
-
-  renderAll(true);
-});
-
-/* =========================================================
-   SAVE GAME FLOW
-   ========================================================= */
-document.getElementById('btnSaveGame').onclick = ()=>{
-  const td = tensionDefaults();
-  const save = {
-    saveId: state.saveId,
-    schemaVersion: 1,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    campaignName: (content.meta && content.meta.name) ? `${content.meta.name} — Solo Run` : 'Solo Run',
-    provenance: state.provenance,
-    contentSnapshot: content,
-    map: {
-      radius: RADIUS,
-      hexSize: SIZE,
-      current: state.current,
-      hexes: [...state.hexes.values()]
-    },
-    tension: {
-      value: state.tension,
-      step: state.step,
-      bleedTo: td.bleedTo,
-      ceiling: td.ceiling,
-      pending: state.pending
-    },
-    npcs: state.npcs,
-    quests: state.quests,
-    eventLog: state.log.map(e => ({ id: 'evt_'+Math.random().toString(36).slice(2,9), timestamp: new Date(e.t).toISOString(), tag: e.tag, text: e.text }))
-  };
-  const safeName = (content.meta && content.meta.name ? content.meta.name : 'save').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
-  downloadJson(save, `field-companion-${safeName}-${new Date().toISOString().slice(0,10)}.json`);
-};
-
-/* =========================================================
+/* ==========================================================
    UNIFIED RENDER
-   Call renderAll(true) for full resets (new game, load game,
-   init). Individual operations call only what they affect.
-   ========================================================= */
-function renderAll(resetUI = false){
+   renderAll(true) resets the UI completely (new game / load /
+   init).  Individual operations call only what they touch.
+   ========================================================== */
+function renderAll(resetUI=false){
   if(resetUI){
-    currentDetailHex = null;
-    document.getElementById('hexDetail').innerHTML   = EMPTY_HEX_DETAIL;
-    document.getElementById('eventResult').innerHTML = EMPTY_EVENT_RESULT;
-    const settingName = (content.meta && content.meta.name) || 'Untitled Setting';
-    document.getElementById('activeSettingLabel').textContent = settingName;
-    document.getElementById('mapTitle').textContent           = settingName;
-    document.getElementById('freqSlider').value = state.step;
-    document.getElementById('freqLabel').textContent = freqLabelFor(state.step);
+    currentDetailHex=null;
+    document.getElementById('btnMoveToHex').style.display='none';
+    document.getElementById('hexDetail').innerHTML=EMPTY_HEX_DETAIL;
+    document.getElementById('eventResult').innerHTML=EMPTY_EVENT_RESULT;
+    document.getElementById('activeSettingLabel').textContent=content.meta?.name||'Untitled Setting';
+    document.getElementById('mapPanelTitle').textContent=activeSnap().meta?.name||'Map';
+    document.getElementById('freqSlider').value=state.tension.step;
+    document.getElementById('freqLabel').textContent=freqLabelFor(state.tension.step);
   }
+  renderMapSwitcher();
   renderMap();
   renderTension();
   renderPending();
@@ -1748,126 +1147,215 @@ function renderAll(resetUI = false){
   renderQuests();
 }
 
-/* =========================================================
+/* ==========================================================
+   NEW GAME FLOW
+   ========================================================== */
+let pendingSettingTemplate=null, pendingMapTemplate=null;
+
+document.getElementById('btnOpenNewGame').onclick=()=>{
+  pendingSettingTemplate=pendingMapTemplate=null;
+  document.getElementById('settingPickLabel').textContent='Default \u2014 The Hollow Reach';
+  document.getElementById('mapPickLabel').textContent='Default \u2014 Generated, radius 4';
+  document.getElementById('newGameErrors').innerHTML='';
+  document.getElementById('newGameDialog').showModal();
+};
+document.getElementById('btnCancelNewGame').onclick=()=>document.getElementById('newGameDialog').close();
+document.getElementById('btnPickSetting').onclick=()=>document.getElementById('fileSettingTemplate').click();
+document.getElementById('btnPickMap').onclick=()=>document.getElementById('fileMapTemplate').click();
+document.getElementById('btnClearSetting').onclick=()=>{ pendingSettingTemplate=null; document.getElementById('settingPickLabel').textContent='Default \u2014 The Hollow Reach'; };
+document.getElementById('btnClearMap').onclick=()=>{ pendingMapTemplate=null; document.getElementById('mapPickLabel').textContent='Default \u2014 Generated, radius 4'; };
+
+document.getElementById('fileSettingTemplate').addEventListener('change',async e=>{
+  const file=e.target.files[0]; e.target.value=''; if(!file) return;
+  const r=await readJsonFile(file); if(!r.ok){ showInlineErrors('newGameErrors','Setting Template couldn\u2019t be loaded',[r.error]); return; }
+  const c=validateSettingTemplate(r.data); if(!c.valid){ showInlineErrors('newGameErrors',`"${file.name}" isn\u2019t a valid Setting Template`,c.errors); return; }
+  showInlineErrors('newGameErrors','',[]); pendingSettingTemplate=r.data;
+  document.getElementById('settingPickLabel').textContent=r.data.meta?.name||file.name;
+});
+
+document.getElementById('fileMapTemplate').addEventListener('change',async e=>{
+  const file=e.target.files[0]; e.target.value=''; if(!file) return;
+  const r=await readJsonFile(file); if(!r.ok){ showInlineErrors('newGameErrors','Map Template couldn\u2019t be loaded',[r.error]); return; }
+  const c=validateMapTemplate(r.data); if(!c.valid){ showInlineErrors('newGameErrors',`"${file.name}" isn\u2019t a valid Map Template`,c.errors); return; }
+  showInlineErrors('newGameErrors','',[]); pendingMapTemplate=r.data;
+  document.getElementById('mapPickLabel').textContent=r.data.meta?.name||file.name;
+});
+
+document.getElementById('btnStartNewGame').onclick=()=>{
+  content=deepClone(pendingSettingTemplate||DEFAULT_SETTING_TEMPLATE);
+  const mapTpl=deepClone(pendingMapTemplate||DEFAULT_MAP_TEMPLATE);
+  const firstMap=createMapEntry(mapTpl);
+  const td=tensionDefaults();
+  state.saveId='save_'+Math.random().toString(36).slice(2,10);
+  state.maps=[firstMap]; state.activeMapId=firstMap.id;
+  state.tension={value:td.startingValue,step:12,bleedTo:td.bleedTo,ceiling:td.ceiling,pending:[]};
+  state.npcs=[]; state.quests=[]; state.log=[];
+  state.provenance={settingTemplateId:content.templateId||'custom',settingTemplateVersion:content.templateVersion||1};
+  SIZE=mapTpl.hexSize||30;
+  document.getElementById('newGameDialog').close(); hideError(); renderAll(true);
+};
+
+/* ==========================================================
+   LOAD MAP (mid-campaign)
+   ========================================================== */
+document.getElementById('btnLoadMap').onclick=()=>document.getElementById('fileLoadMap').click();
+
+document.getElementById('fileLoadMap').addEventListener('change',async e=>{
+  const file=e.target.files[0]; e.target.value=''; if(!file) return;
+  const r=await readJsonFile(file); if(!r.ok){ showError("Map Template couldn\u2019t be loaded",[r.error]); return; }
+  const c=validateMapTemplate(r.data); if(!c.valid){ showError(`"${file.name}" isn\u2019t a valid Map Template`,c.errors); return; }
+  hideError();
+  const mapEntry=createMapEntry(r.data);
+  state.maps.push(mapEntry);
+  switchToMap(mapEntry.id);
+  // Refresh panels that include cross-map location data
+  renderDraft(); renderRoster(); renderQuests();
+});
+
+/* ==========================================================
+   LOAD GAME
+   ========================================================== */
+document.getElementById('btnOpenLoadGame').onclick=()=>document.getElementById('fileLoadGame').click();
+
+document.getElementById('fileLoadGame').addEventListener('change',async e=>{
+  const file=e.target.files[0]; e.target.value=''; if(!file) return;
+  const r=await readJsonFile(file); if(!r.ok){ showError('Save file couldn\u2019t be loaded',[r.error]); return; }
+  const c=validateSaveGame(r.data); if(!c.valid){ showError(`"${file.name}" isn\u2019t a valid save file`,c.errors.concat(['Your current game was not changed.'])); return; }
+  const data=r.data; hideError();
+  content=deepClone(data.contentSnapshot);
+  state.saveId=data.saveId||('save_'+Math.random().toString(36).slice(2,10));
+  state.maps=data.maps.map(m=>({
+    id:m.id, templateId:m.templateId, templateVersion:m.templateVersion, templateSnapshot:m.templateSnapshot,
+    hexes:new Map((m.hexes||[]).map(h=>{ const hid=h.id||hexKey(h.q,h.r); return [hid,{id:hid,q:h.q,r:h.r,terrain:h.terrain,explored:!!h.explored,name:h.name||null,notes:h.notes||''}]; })),
+    current:m.current||{q:0,r:0}
+  }));
+  state.activeMapId=data.activeMapId;
+  state.tension={value:data.tension.value,step:data.tension.step||12,bleedTo:data.tension.bleedTo||8,ceiling:data.tension.ceiling||95,pending:data.tension.pending||[]};
+  state.npcs=(data.npcs||[]).map(n=>({...n,tags:n.tags||[]}));
+  state.quests=data.quests||[];
+  state.log=(data.eventLog||[]).map(e=>({tag:e.tag,text:e.text,t:e.timestamp?Date.parse(e.timestamp):Date.now()}));
+  state.provenance=data.provenance||{};
+  SIZE=activeSnap().hexSize||30;
+  renderAll(true);
+});
+
+/* ==========================================================
+   SAVE GAME
+   ========================================================== */
+document.getElementById('btnSaveGame').onclick=()=>{
+  const save={
+    saveId:state.saveId, schemaVersion:2,
+    createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(),
+    campaignName:(content.meta?.name||'Campaign')+' \u2014 Solo Run',
+    provenance:state.provenance, contentSnapshot:content,
+    activeMapId:state.activeMapId,
+    maps:state.maps.map(m=>({id:m.id,templateId:m.templateId,templateVersion:m.templateVersion,templateSnapshot:m.templateSnapshot,hexes:[...m.hexes.values()],current:m.current})),
+    tension:state.tension, npcs:state.npcs, quests:state.quests,
+    eventLog:state.log.map(e=>({id:'evt_'+Math.random().toString(36).slice(2,9),timestamp:new Date(e.t).toISOString(),tag:e.tag,text:e.text}))
+  };
+  const name=(content.meta?.name||'save').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+  downloadJson(save,`field-companion-${name}-${new Date().toISOString().slice(0,10)}.json`);
+};
+
+/* ==========================================================
    STATIC BUTTON WIRING
-   These elements are permanent — direct assignment is fine.
-   ========================================================= */
-
-// Debug map tools
-document.getElementById('btnRevealAll').onclick = ()=>{
-  for(const h of state.hexes.values()){ h.explored = true; if(!h.name) h.name = nameForHex(h); }
-  renderMap();
-};
-document.getElementById('btnResetFog').onclick = ()=>{
-  for(const h of state.hexes.values()){
-    const isCenter = h.q===0 && h.r===0;
-    h.explored = isCenter;
-    if(!isCenter) h.name = null;
-  }
-  state.current = {q:0,r:0};
-  renderMap();
+   ========================================================== */
+document.getElementById('btnMoveToHex').onclick=()=>{
+  if(!currentDetailHex) return;
+  const map=activeMap();
+  travelToHex(currentDetailHex,cubeDistance(map.current.q,map.current.r,currentDetailHex.q,currentDetailHex.r));
 };
 
-// Tension
-document.getElementById('freqSlider').addEventListener('input', e=>{
-  state.step = parseInt(e.target.value, 10);
-  document.getElementById('freqLabel').textContent = freqLabelFor(state.step);
-});
-document.getElementById('btnCheckTension').onclick  = ()=> checkTension('manual check');
-document.getElementById('btnResetTension').onclick  = ()=>{ state.tension = tensionDefaults().bleedTo; renderTension(); };
+document.getElementById('btnRevealAll').onclick=()=>{
+  const map=activeMap(); if(!map) return;
+  for(const h of map.hexes.values()){ h.explored=true; if(!h.name) h.name=nameForHex(h,map.templateSnapshot); }
+  renderMap();
+};
+document.getElementById('btnResetFog').onclick=()=>{
+  const map=activeMap(); if(!map) return;
+  for(const h of map.hexes.values()){ const c=h.q===0&&h.r===0; h.explored=c; if(!c) h.name=null; }
+  map.current={q:0,r:0}; renderMap();
+};
 
-// Event / NPC / Quest generators
-document.getElementById('btnGenerateEvent').onclick = generateEvent;
-document.getElementById('btnGenNpc').onclick         = rollNpc;
-document.getElementById('btnGenQuest').onclick       = rollQuest;
+document.getElementById('freqSlider').addEventListener('input',e=>{ state.tension.step=parseInt(e.target.value,10); document.getElementById('freqLabel').textContent=freqLabelFor(state.tension.step); });
+document.getElementById('btnCheckTension').onclick=()=>checkTension('manual check');
+document.getElementById('btnResetTension').onclick=()=>{ state.tension.value=tensionDefaults().bleedTo; renderTension(); };
+document.getElementById('btnGenerateEvent').onclick=generateEvent;
+document.getElementById('btnGenNpc').onclick=rollNpc;
+document.getElementById('btnGenQuest').onclick=rollQuest;
 
-/* =========================================================
+/* ==========================================================
    EVENT DELEGATION — dynamic content zones
-   Five permanent containers; handlers are registered once.
-   ========================================================= */
+   ========================================================== */
 
-// 1. Hex detail panel
-document.getElementById('hexDetail').addEventListener('click', e=>{
-  const btn = e.target.closest('[data-action]');
-  if(!btn || !currentDetailHex) return;
-  if(btn.dataset.action === 'hex-rename'){
-    const val = document.getElementById('hexRenameInput')?.value.trim();
-    if(val){ currentDetailHex.name = val; renderMap(); showHexDetail(currentDetailHex); }
-  } else if(btn.dataset.action === 'hex-move'){
-    const dist = cubeDistance(state.current.q, state.current.r, currentDetailHex.q, currentDetailHex.r);
-    travelToHex(currentDetailHex, dist);
+// Map switcher
+document.getElementById('mapSwitcher').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-action="switch-map"]');
+  if(btn) switchToMap(btn.dataset.mapId);
+});
+
+// Hex detail — rename only (move is toolbar button)
+document.getElementById('hexDetail').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-action]');
+  if(!btn||!currentDetailHex) return;
+  if(btn.dataset.action==='hex-rename'){
+    const val=document.getElementById('hexRenameInput')?.value.trim();
+    if(val){ currentDetailHex.name=val; renderMap(); showHexDetail(currentDetailHex); }
   }
 });
 
-// 2. NPC draft card
-document.getElementById('npcDraft').addEventListener('click', e=>{
-  const btn = e.target.closest('[data-action]');
-  if(!btn) return;
-  if(btn.dataset.action === 'npc-save-draft')  saveDraftNpc();
-  else if(btn.dataset.action === 'npc-reroll') rollNpc();
-  else if(btn.dataset.action === 'npc-discard'){ draftNpc = null; renderDraft(); }
+// NPC draft
+document.getElementById('npcDraft').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-action]'); if(!btn) return;
+  if(btn.dataset.action==='npc-save-draft')  saveDraftNpc();
+  else if(btn.dataset.action==='npc-reroll') rollNpc();
+  else if(btn.dataset.action==='npc-discard'){ draftNpc=null; renderDraft(); }
 });
 
-// 3. NPC roster cards
-document.getElementById('npcRoster').addEventListener('click', e=>{
-  const btn = e.target.closest('[data-action]');
-  if(!btn) return;
-  const { action } = btn.dataset;
-  const npcId = btn.dataset.npcId;
-  if(action === 'npc-edit')          { editingNpcId = npcId; renderRoster(); }
-  else if(action === 'npc-remove')   { state.npcs = state.npcs.filter(n=>n.id!==npcId); renderRoster(); }
-  else if(action === 'npc-save-edit')  { saveEditNpc(npcId); }
-  else if(action === 'npc-cancel-edit'){ editingNpcId = null; renderRoster(); }
+// NPC roster
+document.getElementById('npcRoster').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-action]'); if(!btn) return;
+  const {action}=btn.dataset, id=btn.dataset.npcId;
+  if(action==='npc-edit')          { editingNpcId=id; renderRoster(); }
+  else if(action==='npc-remove')   { state.npcs=state.npcs.filter(n=>n.id!==id); renderRoster(); }
+  else if(action==='npc-save-edit')  saveEditNpc(id);
+  else if(action==='npc-cancel-edit'){ editingNpcId=null; renderRoster(); }
 });
 
-// 4. Image file uploads (change bubbles, so one listener covers both
-//    #draftImage and #editImage regardless of which is in the DOM)
-document.getElementById('tab-npcs').addEventListener('change', e=>{
-  const input = e.target;
-  if(input.type !== 'file' || !input.files[0]) return;
-  const file = input.files[0];
-  const reader = new FileReader();
-  if(input.id === 'draftImage'){
-    reader.onload = ()=>{ if(draftNpc) draftNpc.imageRef = { type:'embedded', value:reader.result }; };
-  } else if(input.id === 'editImage'){
-    reader.onload = ()=>{
-      const n = state.npcs.find(x=>x.id===editingNpcId);
-      if(n) n.imageRef = { type:'embedded', value:reader.result };
-    };
-  }
-  reader.readAsDataURL(file);
+// Image uploads (change bubbles — covers both draftImage and editImage)
+document.getElementById('tab-npcs').addEventListener('change',e=>{
+  const input=e.target;
+  if(input.type!=='file'||!input.files[0]) return;
+  const reader=new FileReader();
+  if(input.id==='draftImage')      reader.onload=()=>{ if(draftNpc) draftNpc.imageRef={type:'embedded',value:reader.result}; };
+  else if(input.id==='editImage')  reader.onload=()=>{ const n=state.npcs.find(x=>x.id===editingNpcId); if(n) n.imageRef={type:'embedded',value:reader.result}; };
+  reader.readAsDataURL(input.files[0]);
 });
 
-// 5. Quest list cards
-document.getElementById('questList').addEventListener('click', e=>{
-  const btn = e.target.closest('[data-action]');
-  if(!btn) return;
-  const { action } = btn.dataset;
-  const questId = btn.dataset.questId;
-  if(action === 'quest-status'){
-    const q = state.quests.find(q=>q.id===questId);
-    if(q) q.status = btn.dataset.status;
-    renderQuests();
-  } else if(action === 'quest-remove'){
-    state.quests = state.quests.filter(q=>q.id!==questId);
-    renderQuests();
-  }
+// Quest list
+document.getElementById('questList').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-action]'); if(!btn) return;
+  const {action}=btn.dataset, qid=btn.dataset.questId;
+  if(action==='quest-status'){ const q=state.quests.find(q=>q.id===qid); if(q) q.status=btn.dataset.status; renderQuests(); }
+  else if(action==='quest-remove'){ state.quests=state.quests.filter(q=>q.id!==qid); renderQuests(); }
 });
 
-// 6. Tab switching
-document.querySelector('.tabs').addEventListener('click', e=>{
-  const btn = e.target.closest('.tab-btn');
-  if(!btn) return;
+// Tab switching
+document.querySelector('.tabs').addEventListener('click',e=>{
+  const btn=e.target.closest('.tab-btn'); if(!btn) return;
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
 });
 
-/* =========================================================
+/* ==========================================================
    INIT
-   ========================================================= */
-applyMapTemplate(deepClone(DEFAULT_MAP_TEMPLATE));
+   ========================================================== */
+const _initMap=createMapEntry(deepClone(DEFAULT_MAP_TEMPLATE));
+state.maps=[_initMap];
+state.activeMapId=_initMap.id;
+SIZE=DEFAULT_MAP_TEMPLATE.hexSize||30;
 renderAll(true);
 </script>
 </body>
