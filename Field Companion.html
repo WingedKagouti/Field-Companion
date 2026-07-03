@@ -158,6 +158,26 @@
   .template-picker .tp-actions{display:flex;gap:6px;flex-shrink:0;}
   .dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
 
+  /* Dice roller */
+  .dice-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .dice-input{display:flex;align-items:center;gap:6px;flex:1;min-width:0;}
+  .dice-num{width:50px;font-family:'IBM Plex Mono',monospace;font-size:14px;padding:7px 6px;border:1px solid var(--ink);background:var(--parchment);color:var(--ink);text-align:center;}
+  #diceSides{font-family:'IBM Plex Mono',monospace;font-size:13px;padding:7px 6px;border:1px solid var(--ink);background:var(--parchment);color:var(--ink);}
+  .dice-sep{font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--ink-soft);font-weight:600;flex-shrink:0;}
+  .dice-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px;}
+  .die-chip{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;min-width:32px;height:32px;padding:0 6px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--ink);background:var(--parchment-deep);}
+  .die-chip.max{background:var(--moss);color:#fff;border-color:var(--moss);}
+  .die-chip.min{background:var(--rust);color:#fff;border-color:var(--rust);}
+  .die-mod{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-soft);padding:0 4px;align-self:center;}
+  .dice-sum{font-family:'Fraunces',serif;font-size:22px;color:var(--ink);}
+  .dice-sum b{font-weight:700;}
+
+  /* Affiliation pills (clickable) */
+  button.pill{cursor:pointer;background:var(--parchment);}
+  button.pill:hover{background:var(--parchment-deep);}
+  button.pill.active{background:var(--moss);color:#fff;border-color:var(--moss);}
+  .affil-pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:3px;}
+
   ::-webkit-scrollbar{width:8px;}
   ::-webkit-scrollbar-thumb{background:var(--brass);}
   ::-webkit-scrollbar-track{background:var(--parchment-deep);}
@@ -274,47 +294,13 @@
         </div>
       </section>
 
-      <!-- Tension -->
+      <!-- NPCs / Quests / Orgs / Nations -->
       <section class="panel" style="margin-bottom:18px;">
-        <div class="panel-head">
-          <h2>Tension</h2>
-          <span class="eyebrow">Complication Clock</span>
-        </div>
-        <div class="panel-body">
-          <div class="tension-row">
-            <div class="dial-wrap">
-              <svg width="120" height="76" viewBox="0 0 120 76">
-                <path d="M10,70 A50,50 0 0 1 110,70" fill="none" stroke="#ddcda3" stroke-width="12" stroke-linecap="round"></path>
-                <path id="dialArc" d="M10,70 A50,50 0 0 1 110,70" fill="none" stroke="#9c3b2e" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 157"></path>
-                <g id="dialNeedle" transform="rotate(0 60 70)">
-                  <line x1="60" y1="70" x2="60" y2="24" stroke="#241f1a" stroke-width="2.5"></line>
-                  <circle cx="60" cy="70" r="5" fill="#a8763e" stroke="#241f1a" stroke-width="1"></circle>
-                </g>
-              </svg>
-            </div>
-            <div class="dial-readout">
-              <div class="reading"><span id="tensionVal">12</span><span>/100</span></div>
-              <div class="desc" id="tensionDesc">Calm. A complication is unlikely right now.</div>
-              <div class="modifier-hint" id="tensionModifier"></div>
-            </div>
-          </div>
-          <div class="freq-control">
-            <label><span>Frequency</span><span id="freqLabel">Average</span></label>
-            <input type="range" id="freqSlider" min="5" max="25" value="12" step="1">
-          </div>
-          <div class="tension-actions">
-            <button class="btn primary small" id="btnCheckTension">Check Now</button>
-            <button class="btn ghost small"   id="btnResetTension">Reset Clock</button>
-          </div>
-          <div class="pending-indicator" id="pendingIndicator">No complications pending.</div>
-        </div>
-      </section>
-
-      <!-- NPCs / Quests -->
-      <section class="panel">
         <div class="tabs">
           <button class="tab-btn active" data-tab="npcs">NPCs</button>
           <button class="tab-btn" data-tab="quests">Quests</button>
+          <button class="tab-btn" data-tab="orgs">Orgs</button>
+          <button class="tab-btn" data-tab="nations">Nations</button>
         </div>
         <div class="panel-body">
           <div class="tab-panel active" id="tab-npcs">
@@ -333,6 +319,72 @@
             </div>
             <div id="questList"><div class="empty-state">No quests yet.</div></div>
           </div>
+          <div class="tab-panel" id="tab-orgs">
+            <div id="orgList"><div class="empty-state">No organisations yet.</div></div>
+          </div>
+          <div class="tab-panel" id="tab-nations">
+            <div id="nationList"><div class="empty-state">No nations yet.</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dice Roller -->
+      <section class="panel" style="margin-bottom:18px;">
+        <div class="panel-head">
+          <h2>Dice</h2>
+          <span class="eyebrow">Roll &amp; Result</span>
+        </div>
+        <div class="panel-body">
+          <div class="dice-row">
+            <div class="dice-input">
+              <input type="number" id="diceCount" class="dice-num" min="1" max="20" value="1">
+              <span class="dice-sep">d</span>
+              <select id="diceSides">
+                <option>4</option><option selected>6</option><option>8</option>
+                <option>10</option><option>12</option><option>20</option><option>100</option>
+              </select>
+              <span class="dice-sep" style="margin:0 2px;">+</span>
+              <input type="number" id="diceMod" class="dice-num" value="0">
+            </div>
+            <button class="btn primary" id="btnRoll">Roll</button>
+          </div>
+          <div id="diceResult" style="margin-top:12px;"></div>
+        </div>
+      </section>
+
+      <!-- Tension -->
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Tension</h2>
+          <span class="eyebrow">Complication Clock</span>
+        </div>
+        <div class="panel-body">
+          <div class="tension-row">
+            <div class="dial-wrap">
+              <svg width="120" height="76" viewBox="0 0 120 76">
+                <path d="M10,70 A50,50 0 0 1 110,70" fill="none" stroke="#ddcda3" stroke-width="12" stroke-linecap="round"></path>
+                <path id="dialArc" d="M10,70 A50,50 0 0 1 110,70" fill="none" stroke="#9c3b2e" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 157"></path>
+                <g id="dialNeedle" transform="rotate(0 60 70)">
+                  <line x1="60" y1="70" x2="60" y2="24" stroke="#241f1a" stroke-width="2.5"></line>
+                  <circle cx="60" cy="70" r="5" fill="#a8763e" stroke="#241f1a" stroke-width="1"></circle>
+                </g>
+              </svg>
+            </div>
+            <div class="dial-readout">
+              <!--<div class="reading"><span id="tensionVal">12</span></div>-->
+              <div class="desc" id="tensionDesc">Calm. A complication is unlikely right now.</div>
+              <div class="modifier-hint" id="tensionModifier"></div>
+            </div>
+          </div>
+          <div class="freq-control">
+            <label><span>Frequency</span><span id="freqLabel">Average</span></label>
+            <input type="range" id="freqSlider" min="5" max="25" value="12" step="1">
+          </div>
+          <div class="tension-actions">
+            <button class="btn primary small" id="btnCheckTension">Check Now</button>
+            <button class="btn ghost small"   id="btnResetTension">Reset Clock</button>
+          </div>
+          <div class="pending-indicator" id="pendingIndicator">No complications pending.</div>
         </div>
       </section>
     </div>
@@ -722,7 +774,7 @@ function tensionDefaults(){ return content.tensionDefaults||{startingValue:12,st
 function renderTension(){
   const v=Math.round(state.tension.value);
   const modifier=activeSnap().tensionModifier??1.0;
-  document.getElementById('tensionVal').textContent=v;
+  //document.getElementById('tensionVal').textContent=v;
   document.getElementById('tensionDesc').textContent=tensionDescription(v);
   const modEl=document.getElementById('tensionModifier');
   modEl.textContent=modifier!==1.0?`\u00d7${modifier.toFixed(1)} in this location`:'';
@@ -988,10 +1040,7 @@ function renderQuests(){
 }
 
 /* ==========================================================
-   VALIDATION — human-readable, never throws
-   ========================================================== */
-/* ==========================================================
-   VALIDATION PIPELINE
+   VALIDATION PIPELINE — human-readable, never throws
    ========================================================== */
 
 function isNonEmptyArray(v)      { return Array.isArray(v) && v.length > 0; }
@@ -1218,12 +1267,106 @@ function readJsonFile(file){
     r.readAsText(file);
   });
 }
-function downloadJson(obj,filename){
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}));
-  a.download=filename; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+// function downloadJson(obj,filename){
+//   const a=document.createElement('a');
+//   a.href=URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}));
+//   a.download=filename; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+// }
+async function downloadJson(dataObject, suggestedName = 'campaign-save.json') {
+    // Check if the browser supports the modern File System Access API
+    if ('showSaveFilePicker' in window) {
+        try {
+            const options = {
+                suggestedName: suggestedName,
+                types: [{
+                    description: 'JSON Files',
+                    accept: {
+                        'application/json': ['.json'],
+                    },
+                }],
+            };
+
+            // This line pauses execution and opens the native OS Save Dialog
+            const handle = await window.showSaveFilePicker(options);
+
+            // Create a writeable stream to the chosen file path
+            const writable = await handle.createWritable();
+            await writable.write(JSON.stringify(dataObject, null, 2));
+            await writable.close();
+
+            console.log('File saved successfully via dialog.');
+        } catch (err) {
+            // Handles cases where the user clicks "Cancel" or closes the dialog
+            if (err.name !== 'AbortError') {
+                console.error('Error saving file:', err);
+            }
+        }
+    } else {
+        // Fallback for older browsers or mobile browsers (Safari/Firefox mobile)
+        fallbackDownloadJson(dataObject, suggestedName);
+    }
 }
 
+function fallbackDownloadJson(dataObject, suggestedName) {
+    const jsonString = JSON.stringify(dataObject, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = suggestedName;
+
+    document.body.appendChild(a);
+    a.click();
+
+    // Clean up memory
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+/* ==========================================================
+   IMAGE HELPER
+   ========================================================== */
+function processAndCompressImage(file, callback) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Define your maximum dimensions for an NPC portrait
+            const MAX_WIDTH = 100;
+            const MAX_HEIGHT = 100;
+            let width = img.width;
+            let height = img.height;
+
+            // Maintain aspect ratio
+            if (width > height) {
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+            } else {
+                if (height > MAX_HEIGHT) {
+                    width *= MAX_HEIGHT / height;
+                    height = MAX_HEIGHT;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            // Draw image onto canvas with new dimensions
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Convert canvas to a compressed base64 JPEG string (quality ranges from 0.0 to 1.0)
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+            callback(compressedDataUrl);
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
 /* ==========================================================
    UNIFIED RENDER
    renderAll(true) resets the UI completely (new game / load /
@@ -1386,7 +1529,28 @@ document.getElementById('btnResetTension').onclick=()=>{ state.tension.value=ten
 document.getElementById('btnGenerateEvent').onclick=generateEvent;
 document.getElementById('btnGenNpc').onclick=rollNpc;
 document.getElementById('btnGenQuest').onclick=rollQuest;
-
+document.getElementById('btnRoll').addEventListener('click', () => {
+    const count = parseInt(document.getElementById('diceCount').value) || 1;
+    const sides = parseInt(document.getElementById('diceSides').value) || 6;
+    const modifier = parseInt(document.getElementById('diceMod').value) || 0;
+  
+  const rolls = [];
+  let sum = 0;
+  
+  for (let i = 0; i < count; i++) {
+    const roll = Math.floor(Math.random() * sides) + 1;
+    rolls.push(roll);
+    sum += roll;
+  }
+  
+  const total = sum + modifier;
+  const modSign = modifier >= 0 ? `+${modifier}` : `${modifier}`;
+  
+  // Format individual dice with inline boxes
+  const diceHTML = rolls.map(r => `[${r}]`).join(' ');
+  
+    document.getElementById('diceResult').innerHTML = `<strong>Result:</strong> ${diceHTML} ${modifier !== 0 ? modSign : ''} = <strong>${total}</strong>`;
+});
 /* ==========================================================
    EVENT DELEGATION — dynamic content zones
    ========================================================== */
@@ -1426,15 +1590,29 @@ document.getElementById('npcRoster').addEventListener('click',e=>{
 });
 
 // Image uploads (change bubbles — covers both draftImage and editImage)
-document.getElementById('tab-npcs').addEventListener('change',e=>{
-  const input=e.target;
-  if(input.type!=='file'||!input.files[0]) return;
-  const reader=new FileReader();
-  if(input.id==='draftImage')      reader.onload=()=>{ if(draftNpc) draftNpc.imageRef={type:'embedded',value:reader.result}; };
-  else if(input.id==='editImage')  reader.onload=()=>{ const n=state.npcs.find(x=>x.id===editingNpcId); if(n) n.imageRef={type:'embedded',value:reader.result}; };
-  reader.readAsDataURL(input.files[0]);
-});
+// document.getElementById('tab-npcs').addEventListener('change',e=>{
+//   const input=e.target;
+//   if(input.type!=='file'||!input.files[0]) return;
+//   const reader=new FileReader();
+//   if(input.id==='draftImage')      reader.onload=()=>{ if(draftNpc) draftNpc.imageRef={type:'embedded',value:reader.result}; };
+//   else if(input.id==='editImage')  reader.onload=()=>{ const n=state.npcs.find(x=>x.id===editingNpcId); if(n) n.imageRef={type:'embedded',value:reader.result}; };
+//   reader.readAsDataURL(input.files[0]);
+// });
+document.body.addEventListener('change', e => {
+    const input = e.target;
+    if (input.type !== 'file' || !input.files || !input.files[0]) return;
 
+    processAndCompressImage(input.files[0], (compressedBase64) => {
+        if (input.id === 'draftImage') {
+            if (draftNpc) draftNpc.imageRef = { type: 'embedded', value: compressedBase64 };
+        } else if (input.id === 'editImage') {
+            const n = state.npcs.find(x => x.id === editingNpcId);
+            if (n) n.imageRef = { type: 'embedded', value: compressedBase64 };
+        }
+
+        // Optional: Trigger a re-render of your NPC preview UI component here if needed
+    });
+});
 // Quest list
 document.getElementById('questList').addEventListener('click',e=>{
   const btn=e.target.closest('[data-action]'); if(!btn) return;
