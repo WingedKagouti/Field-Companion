@@ -990,98 +990,201 @@ function renderQuests(){
 /* ==========================================================
    VALIDATION — human-readable, never throws
    ========================================================== */
-function isNonEmptyArray(v){ return Array.isArray(v)&&v.length>0; }
-function isPlainObject(v){ return v!==null&&typeof v==='object'&&!Array.isArray(v); }
-function isNonEmptyStringArray(v){ return isNonEmptyArray(v)&&v.every(x=>typeof x==='string'&&x.trim().length>0); }
+/* ==========================================================
+   VALIDATION PIPELINE
+   ========================================================== */
+
+function isNonEmptyArray(v)      { return Array.isArray(v) && v.length > 0; }
+function isPlainObject(v)        { return v !== null && typeof v === 'object' && !Array.isArray(v); }
+function isNonEmptyStringArray(v){ return isNonEmptyArray(v) && v.every(x => typeof x === 'string' && x.trim().length > 0); }
+
+/* Resolve a dot-separated field path against an object. */
+function getPath(obj, path){ return path.split('.').reduce((o, k) => o?.[k], obj); }
+
+/*
+ * runSchema(obj, rules) — declarative field checker.
+ *
+ * Rule shape: { field, check, msg, optional?, parent? }
+ *   field    — dot-separated path e.g. 'namePools.npcFirstNames'
+ *   check    — 'object' | 'nonEmptyStringArray' | 'nonEmptyArray' |
+ *              'nonEmptyString' | 'string' | 'number' | 'positiveNumber' |
+ *              'boundedNumber' (0-100) | 'array' | 'enum' (+ values:[])
+ *   msg      — human-readable error string appended on failure
+ *   optional — skip the rule when the field value is undefined
+ *   parent   — dot path; rule is skipped when that parent is not a plain
+ *              object, preventing cascading errors after a parent failure
+ */
+function runSchema(obj, rules){
+  const errors = [];
+  for(const rule of rules){
+    if(rule.parent && !isPlainObject(getPath(obj, rule.parent))) continue;
+    const val = getPath(obj, rule.field);
+    if(rule.optional && val === undefined) continue;
+    let ok;
+    switch(rule.check){
+      case 'object':             ok = isPlainObject(val);                            break;
+      case 'nonEmptyStringArray':ok = isNonEmptyStringArray(val);                   break;
+      case 'nonEmptyArray':      ok = isNonEmptyArray(val);                          break;
+      case 'nonEmptyString':     ok = typeof val === 'string' && !!val.trim();       break;
+      case 'string':             ok = typeof val === 'string';                       break;
+      case 'number':             ok = typeof val === 'number';                       break;
+      case 'positiveNumber':     ok = typeof val === 'number' && val > 0;            break;
+      case 'boundedNumber':      ok = typeof val === 'number' && val >= 0 && val <= 100; break;
+      case 'array':              ok = Array.isArray(val);                            break;
+      case 'enum':               ok = rule.values.includes(val);                    break;
+      default:                   ok = true;
+    }
+    if(!ok) errors.push(rule.msg);
+  }
+  return errors;
+}
+
+/* Shared helper — validate every item of an encounter table array. */
+function checkEncounterArray(arr, path){
+  if(!Array.isArray(arr)) return [`"${path}" must be an array.`];
+  return arr.flatMap((en, i) =>
+    (!isPlainObject(en) || typeof en.text !== 'string' || !en.text.trim())
+      ? [`${path}[${i}] must have a non-empty "text" string.`] : []
+  );
+}
+
+/* Shared helper — validate every entry of a terrain definition object. */
+function checkTerrainEntries(terrain){
+  const errors = [];
+  for(const [k, t] of Object.entries(terrain)){
+    if(!isPlainObject(t)){ errors.push(`terrain.${k} must be an object.`); continue; }
+    errors.push(...runSchema(t, [
+      { field:'label',   check:'nonEmptyString', msg:`terrain.${k}.label must be a non-empty string.`  },
+      { field:'color',   check:'nonEmptyString', msg:`terrain.${k}.color must be a non-empty string.`  },
+      { field:'weight',  check:'positiveNumber', msg:`terrain.${k}.weight must be a positive number.`  },
+      { field:'icon',    check:'string', optional:true, msg:`terrain.${k}.icon must be a string (built-in shape name).` },
+      { field:'iconUrl', check:'string', optional:true, msg:`terrain.${k}.iconUrl must be a string URL.`               },
+    ]));
+  }
+  return errors;
+}
+
+/* ── Declarative schemas ──────────────────────────────────── */
+
+const SETTING_SCHEMA = [
+  { field:'namePools',                  check:'object',             msg:'"namePools" is missing.'                                                                                    },
+  { field:'namePools.npcFirstNames',    check:'nonEmptyStringArray',msg:'namePools.npcFirstNames must be a non-empty array of strings.',    parent:'namePools'                       },
+  { field:'namePools.npcSurnames',      check:'nonEmptyStringArray',msg:'namePools.npcSurnames must be a non-empty array of strings.',      parent:'namePools'                       },
+  { field:'namePools.professions',      check:'nonEmptyStringArray',msg:'namePools.professions must be a non-empty array of strings.',      parent:'namePools'                       },
+  { field:'namePools.traits',           check:'nonEmptyStringArray',msg:'namePools.traits must be a non-empty array of strings.',           parent:'namePools'                       },
+  { field:'namePools.settlementNames',  check:'nonEmptyStringArray',msg:'namePools.settlementNames, if present, must be a non-empty array of strings.', optional:true, parent:'namePools' },
+  { field:'namePools.ruinNames',        check:'nonEmptyStringArray',msg:'namePools.ruinNames, if present, must be a non-empty array of strings.',       optional:true, parent:'namePools' },
+  { field:'questTemplates',             check:'object',             msg:'"questTemplates" with "verbs" and "items" is missing.'                                                      },
+  { field:'questTemplates.verbs',       check:'nonEmptyStringArray',msg:'questTemplates.verbs must be a non-empty array of strings.',       parent:'questTemplates'                  },
+  { field:'questTemplates.items',       check:'nonEmptyStringArray',msg:'questTemplates.items must be a non-empty array of strings.',       parent:'questTemplates'                  },
+  { field:'complications',              check:'nonEmptyStringArray',msg:'"complications" must be a non-empty array of strings.'                                                      },
+  { field:'tensionDefaults',            check:'object',  optional:true,                  msg:'"tensionDefaults", if present, must be an object.'                                     },
+  { field:'tensionDefaults.startingValue', check:'boundedNumber', optional:true, parent:'tensionDefaults', msg:'tensionDefaults.startingValue must be a number 0-100.'              },
+  { field:'tensionDefaults.step',          check:'boundedNumber', optional:true, parent:'tensionDefaults', msg:'tensionDefaults.step must be a number 0-100.'                       },
+  { field:'tensionDefaults.bleedTo',       check:'boundedNumber', optional:true, parent:'tensionDefaults', msg:'tensionDefaults.bleedTo must be a number 0-100.'                    },
+  { field:'tensionDefaults.ceiling',       check:'boundedNumber', optional:true, parent:'tensionDefaults', msg:'tensionDefaults.ceiling must be a number 0-100.'                    },
+];
+
+const MAP_BASE_SCHEMA = [
+  { field:'mode',            check:'enum',          values:['generated','authored'], msg:'"mode" must be "generated" or "authored".'                                                },
+  { field:'meta',            check:'object',        optional:true,                   msg:'"meta", if present, must be an object {name, description}.'                              },
+  { field:'hexSize',         check:'positiveNumber',optional:true,                   msg:'"hexSize", if present, must be a positive number.'                                       },
+  { field:'centerHex',       check:'object',        optional:true,                   msg:'"centerHex", if present, must be an object {terrain, name, explored}.'                   },
+  { field:'tensionModifier', check:'positiveNumber',optional:true,                   msg:'"tensionModifier", if present, must be a positive number (e.g. 1.5 tenser, 0.5 calmer).'},
+];
+
+const SAVE_BASE_SCHEMA = [
+  { field:'activeMapId',      check:'nonEmptyString', msg:'"activeMapId" must be a non-empty string.'   },
+  { field:'tension',          check:'object',         msg:'"tension" object is missing.'                 },
+  { field:'tension.value',    check:'number',         parent:'tension', msg:'tension.value must be a number.'   },
+  { field:'tension.pending',  check:'array',          parent:'tension', msg:'tension.pending must be an array.' },
+  { field:'npcs',             check:'array',          msg:'"npcs" must be an array.'                     },
+  { field:'quests',           check:'array',          msg:'"quests" must be an array.'                   },
+  { field:'eventLog',         check:'array',          msg:'"eventLog" must be an array.'                 },
+  { field:'contentSnapshot',  check:'object',         msg:'"contentSnapshot" is missing.'                },
+];
+
+/* ── Validator functions ──────────────────────────────────── */
 
 function validateSettingTemplate(obj){
-  const e=[];
-  if(!isPlainObject(obj)) return {valid:false,errors:['File does not contain a JSON object at its root.']};
-  if(!isPlainObject(obj.namePools)) e.push('"namePools" is missing.');
-  else {
-    for(const f of ['npcFirstNames','npcSurnames','professions','traits'])
-      if(!isNonEmptyStringArray(obj.namePools[f])) e.push(`namePools.${f} must be a non-empty array of strings.`);
-    for(const f of ['settlementNames','ruinNames'])
-      if(obj.namePools[f]!==undefined&&!isNonEmptyStringArray(obj.namePools[f])) e.push(`namePools.${f}, if present, must be a non-empty array of strings.`);
-  }
-  if(!isPlainObject(obj.questTemplates)) e.push('"questTemplates" with "verbs" and "items" arrays is missing.');
-  else {
-    if(!isNonEmptyStringArray(obj.questTemplates.verbs)) e.push('questTemplates.verbs must be a non-empty array of strings.');
-    if(!isNonEmptyStringArray(obj.questTemplates.items)) e.push('questTemplates.items must be a non-empty array of strings.');
-  }
-  if(!isNonEmptyStringArray(obj.complications)) e.push('"complications" must be a non-empty array of strings.');
-  if(obj.genericEncounters!==undefined){
-    if(!Array.isArray(obj.genericEncounters)) e.push('"genericEncounters", if present, must be an array of {tag?,text} objects.');
-    else obj.genericEncounters.forEach((en,i)=>{ if(!isPlainObject(en)||typeof en.text!=='string'||!en.text.trim()) e.push(`genericEncounters[${i}] must have a non-empty "text" string.`); });
-  }
-  if(obj.tensionDefaults!==undefined){
-    if(!isPlainObject(obj.tensionDefaults)) e.push('"tensionDefaults" must be an object.');
-    else for(const f of ['startingValue','step','bleedTo','ceiling']){
-      const v=obj.tensionDefaults[f];
-      if(v!==undefined&&(typeof v!=='number'||v<0||v>100)) e.push(`tensionDefaults.${f} must be a number 0-100.`);
-    }
-  }
-  return {valid:e.length===0,errors:e};
+  if(!isPlainObject(obj)) return {valid:false, errors:['File does not contain a JSON object at its root.']};
+  const errors = runSchema(obj, SETTING_SCHEMA);
+  if(obj.genericEncounters !== undefined)
+    errors.push(...checkEncounterArray(obj.genericEncounters, 'genericEncounters'));
+  return {valid: errors.length === 0, errors};
 }
 
 function validateMapTemplate(obj){
-  const e=[];
-  if(!isPlainObject(obj)) return {valid:false,errors:['File does not contain a JSON object at its root.']};
-  if(obj.meta!==undefined&&!isPlainObject(obj.meta)) e.push('"meta", if present, must be an object {name,description}.');
-  if(obj.mode!=='generated'&&obj.mode!=='authored') e.push('"mode" must be "generated" or "authored".');
-  if(!isPlainObject(obj.terrain)||!Object.keys(obj.terrain).length)
-    e.push('"terrain" is required in a Map Template and must define at least one type with {label,color,weight}.');
-  else for(const [k,t] of Object.entries(obj.terrain)){
-    if(!isPlainObject(t)){e.push(`terrain.${k} must be an object.`);continue;}
-    if(typeof t.label!=='string'||!t.label.trim()) e.push(`terrain.${k}.label must be a non-empty string.`);
-    if(typeof t.color!=='string'||!t.color.trim()) e.push(`terrain.${k}.color must be a non-empty string.`);
-    if(typeof t.weight!=='number'||!(t.weight>0))  e.push(`terrain.${k}.weight must be a positive number.`);
-    if(t.icon!==undefined&&typeof t.icon!=='string') e.push(`terrain.${k}.icon must be a string (built-in shape name).`);
-    if(t.iconUrl!==undefined&&typeof t.iconUrl!=='string') e.push(`terrain.${k}.iconUrl must be a string URL.`);
+  if(!isPlainObject(obj)) return {valid:false, errors:['File does not contain a JSON object at its root.']};
+  const errors = runSchema(obj, MAP_BASE_SCHEMA);
+
+  // terrain — required, with per-entry checks
+  if(!isPlainObject(obj.terrain) || !Object.keys(obj.terrain).length)
+    errors.push('"terrain" is required and must define at least one type with {label, color, weight}.');
+  else
+    errors.push(...checkTerrainEntries(obj.terrain));
+
+  // encounterTables — required, with per-table entry checks
+  if(!isPlainObject(obj.encounterTables) || !isNonEmptyArray(obj.encounterTables.generic))
+    errors.push('"encounterTables" with at least a non-empty "generic" array is required.');
+  else
+    for(const [k, arr] of Object.entries(obj.encounterTables))
+      errors.push(...checkEncounterArray(arr, `encounterTables.${k}`));
+
+  // mode-specific checks
+  if(obj.mode === 'generated' && obj.radius !== undefined &&
+     (typeof obj.radius !== 'number' || obj.radius < 1 || obj.radius > 12))
+    errors.push('"radius" must be between 1 and 12.');
+  if(obj.mode === 'authored'){
+    if(!isNonEmptyArray(obj.authoredHexes))
+      errors.push('"authoredHexes" must be a non-empty array when mode is "authored".');
+    else
+      obj.authoredHexes.forEach((h, i) => {
+        if(!isPlainObject(h) || typeof h.q !== 'number' || typeof h.r !== 'number' || typeof h.terrain !== 'string')
+          errors.push(`authoredHexes[${i}] needs numeric q, r and a string terrain.`);
+      });
   }
-  if(!isPlainObject(obj.encounterTables)||!isNonEmptyArray(obj.encounterTables.generic))
-    e.push('"encounterTables" with at least a non-empty "generic" array is required.');
-  else for(const [k,arr] of Object.entries(obj.encounterTables)){
-    if(!Array.isArray(arr)){e.push(`encounterTables.${k} must be an array.`);continue;}
-    arr.forEach((en,i)=>{ if(!isPlainObject(en)||typeof en.text!=='string'||!en.text.trim()) e.push(`encounterTables.${k}[${i}] must have a non-empty "text" string.`); });
-  }
-  if(obj.mode==='generated'&&obj.radius!==undefined&&(typeof obj.radius!=='number'||obj.radius<1||obj.radius>12)) e.push('"radius" must be 1-12.');
-  if(obj.mode==='authored'){
-    if(!isNonEmptyArray(obj.authoredHexes)) e.push('"authoredHexes" must be a non-empty array when mode is "authored".');
-    else obj.authoredHexes.forEach((h,i)=>{ if(!isPlainObject(h)||typeof h.q!=='number'||typeof h.r!=='number'||typeof h.terrain!=='string') e.push(`authoredHexes[${i}] needs numeric q,r and string terrain.`); });
-  }
-  if(obj.hexSize!==undefined&&(typeof obj.hexSize!=='number'||obj.hexSize<=0)) e.push('"hexSize" must be a positive number.');
-  if(obj.centerHex!==undefined&&!isPlainObject(obj.centerHex)) e.push('"centerHex" must be an object {terrain,name,explored}.');
-  if(obj.tensionModifier!==undefined&&(typeof obj.tensionModifier!=='number'||obj.tensionModifier<=0)) e.push('"tensionModifier" must be a positive number (e.g. 1.5 for tenser, 0.5 for calmer).');
-  return {valid:e.length===0,errors:e};
+
+  return {valid: errors.length === 0, errors};
 }
 
 function validateSaveGame(obj){
-  const e=[];
-  if(!isPlainObject(obj)) return {valid:false,errors:['File does not contain a JSON object at its root.']};
-  if(obj.schemaVersion===1) return {valid:false,errors:['This is a version 1 save file. The app now uses version 2 and cannot load version 1 saves.']};
-  if(!isNonEmptyArray(obj.maps)) e.push('"maps" must be a non-empty array.');
-  else obj.maps.forEach((m,i)=>{
-    if(!isPlainObject(m)){e.push(`maps[${i}] must be an object.`);return;}
-    if(typeof m.id!=='string'||!m.id.trim()) e.push(`maps[${i}].id must be a non-empty string.`);
-    if(!isPlainObject(m.current)||typeof m.current.q!=='number'||typeof m.current.r!=='number') e.push(`maps[${i}].current must have numeric q and r.`);
-    if(!isNonEmptyArray(m.hexes)) e.push(`maps[${i}].hexes must be a non-empty array.`);
-    if(!isPlainObject(m.templateSnapshot)) e.push(`maps[${i}].templateSnapshot is missing \u2014 this map cannot be restored.`);
-    else { const mc=validateMapTemplate(m.templateSnapshot); if(!mc.valid) e.push(`maps[${i}].templateSnapshot: ${mc.errors.join(' | ')}`); }
-  });
-  if(typeof obj.activeMapId!=='string'||!obj.activeMapId.trim()) e.push('"activeMapId" must be a non-empty string.');
-  else if(isNonEmptyArray(obj.maps)&&!obj.maps.find(m=>m.id===obj.activeMapId)) e.push(`activeMapId "${obj.activeMapId}" does not match any map in the maps array.`);
-  if(!isPlainObject(obj.tension)) e.push('"tension" object is missing.');
-  else {
-    if(typeof obj.tension.value!=='number') e.push('tension.value must be a number.');
-    if(!Array.isArray(obj.tension.pending)) e.push('tension.pending must be an array.');
+  if(!isPlainObject(obj)) return {valid:false, errors:['File does not contain a JSON object at its root.']};
+  if(obj.schemaVersion === 1) return {valid:false, errors:['This is a version 1 save file. The app now uses version 2 and cannot load version 1 saves.']};
+
+  const errors = runSchema(obj, SAVE_BASE_SCHEMA);
+
+  // maps array — each entry validated with its own map template snapshot
+  if(!isNonEmptyArray(obj.maps))
+    errors.push('"maps" must be a non-empty array.');
+  else
+    obj.maps.forEach((m, i) => {
+      if(!isPlainObject(m)){ errors.push(`maps[${i}] must be an object.`); return; }
+      errors.push(...runSchema(m, [
+        { field:'id',               check:'nonEmptyString', msg:`maps[${i}].id must be a non-empty string.`                         },
+        { field:'hexes',            check:'nonEmptyArray',  msg:`maps[${i}].hexes must be a non-empty array.`                       },
+        { field:'current',          check:'object',         msg:`maps[${i}].current must be an object with q and r.`                },
+        { field:'current.q',        check:'number', parent:'current', msg:`maps[${i}].current.q must be a number.`                  },
+        { field:'current.r',        check:'number', parent:'current', msg:`maps[${i}].current.r must be a number.`                  },
+        { field:'templateSnapshot', check:'object',         msg:`maps[${i}].templateSnapshot is missing \u2014 map cannot be restored.` },
+      ]));
+      if(isPlainObject(m.templateSnapshot)){
+        const mc = validateMapTemplate(m.templateSnapshot);
+        if(!mc.valid) errors.push(`maps[${i}].templateSnapshot: ${mc.errors.join(' | ')}`);
+      }
+    });
+
+  // cross-reference: activeMapId must resolve to a real map
+  if(isNonEmptyArray(obj.maps) && typeof obj.activeMapId === 'string' && !obj.maps.find(m => m.id === obj.activeMapId))
+    errors.push(`activeMapId "${obj.activeMapId}" does not match any map in the maps array.`);
+
+  // contentSnapshot — already confirmed as object above; run full setting validation
+  if(isPlainObject(obj.contentSnapshot)){
+    const sc = validateSettingTemplate(obj.contentSnapshot);
+    if(!sc.valid) errors.push('contentSnapshot: ' + sc.errors.join(' | '));
   }
-  if(!Array.isArray(obj.npcs))    e.push('"npcs" must be an array.');
-  if(!Array.isArray(obj.quests))  e.push('"quests" must be an array.');
-  if(!Array.isArray(obj.eventLog))e.push('"eventLog" must be an array.');
-  if(!isPlainObject(obj.contentSnapshot)) e.push('"contentSnapshot" is missing.');
-  else { const sc=validateSettingTemplate(obj.contentSnapshot); if(!sc.valid) e.push('contentSnapshot: '+sc.errors.join(' | ')); }
-  return {valid:e.length===0,errors:e};
+
+  return {valid: errors.length === 0, errors};
 }
 
 /* ==========================================================
