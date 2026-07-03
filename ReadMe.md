@@ -1,7 +1,3 @@
-A simple helper app for single player tabletop roleplaying meant to run without an internet connection.
-
-Use the BaseSettings.json and MapTemplate.json files as templates for your own versions.
-
 # Field Companion
 
 > **Solo Play Toolkit • Bookkeeping & Oracle, Not Arbitration**
@@ -50,6 +46,8 @@ Field Companion can adapt to entirely different TTRPG rulesets or world settings
 * Procedural quest verb/item tables
 
 Load your custom setting via the application's configuration layout panel to completely reskin the generator databases.
+
+You can use the SettingTemplate.json and MapTemplate.json files as a basis for your own versions.
 
 ---
 
