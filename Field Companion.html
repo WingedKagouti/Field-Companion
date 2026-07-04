@@ -637,17 +637,45 @@ function nameForHex(hex, snap){
 /* ==========================================================
    BUILT-IN ICON SHAPES
    Referenced by terrainDef.icon; terrainDef.iconUrl takes precedence.
-   Built-in names: plains, forest, hills, mountains, water, swamp, ruins, settlement
+
+   Wilderness:  plains, forest, hills, mountains, water, swamp, ruins, settlement
+   City / interior buildings:  house, bighouse, shop, temple
+   Cave / dungeon:  chamber, passage, chasm, stairs, pool, pillar
    ========================================================== */
 const ICON_SHAPES = {
-  plains:()=>'',
-  forest:(cx,cy,s)=>`<polygon points="${cx},${cy-s} ${cx-s*.6},${cy+s*.5} ${cx+s*.6},${cy+s*.5}" fill="#3f4a30" opacity=".55"></polygon>`,
-  mountains:(cx,cy,s)=>`<polygon points="${cx-s*.7},${cy+s*.5} ${cx},${cy-s} ${cx+s*.7},${cy+s*.5}" fill="#4a4038" opacity=".5"></polygon><polygon points="${cx-s*.15},${cy-s*.25} ${cx+s*.15},${cy-s*.25} ${cx+s*.3},${cy+s*.5} ${cx-s*.3},${cy+s*.5}" fill="#fff" opacity=".25"></polygon>`,
-  hills:(cx,cy,s)=>`<circle cx="${cx-s*.35}" cy="${cy+s*.2}" r="${s*.45}" fill="#8a7042" opacity=".45"></circle><circle cx="${cx+s*.35}" cy="${cy+s*.25}" r="${s*.4}" fill="#8a7042" opacity=".45"></circle>`,
-  water:(cx,cy,s)=>`<path d="M ${cx-s*.7} ${cy} q ${s*.35} ${-s*.35}, ${s*.7} 0 t ${s*.7} 0" stroke="#1f3a3a" stroke-width="2" fill="none" opacity=".55"></path>`,
-  swamp:(cx,cy,s)=>`<path d="M ${cx-s*.6} ${cy+s*.2} q ${s*.3} ${-s*.4}, ${s*.6} 0 t ${s*.6} 0" stroke="#2e2f1c" stroke-width="1.6" fill="none" opacity=".5"></path>`,
-  ruins:(cx,cy,s)=>`<rect x="${cx-s*.45}" y="${cy-s*.1}" width="${s*.25}" height="${s*.65}" fill="#574a36" opacity=".55"></rect><rect x="${cx+s*.15}" y="${cy-s*.35}" width="${s*.22}" height="${s*.9}" fill="#574a36" opacity=".55"></rect>`,
-  settlement:(cx,cy,s)=>`<polygon points="${cx-s*.4},${cy+s*.45} ${cx-s*.4},${cy} ${cx},${cy-s*.45} ${cx+s*.4},${cy} ${cx+s*.4},${cy+s*.45}" fill="#3a2a16" opacity=".6"></polygon>`
+  /* ── Wilderness ─────────────────────────────────────────── */
+  plains:     ()=>'',
+  forest:     (cx,cy,s)=>`<polygon points="${cx},${cy-s} ${cx-s*.6},${cy+s*.5} ${cx+s*.6},${cy+s*.5}" fill="#3f4a30" opacity=".55"></polygon>`,
+  mountains:  (cx,cy,s)=>`<polygon points="${cx-s*.7},${cy+s*.5} ${cx},${cy-s} ${cx+s*.7},${cy+s*.5}" fill="#4a4038" opacity=".5"></polygon><polygon points="${cx-s*.15},${cy-s*.25} ${cx+s*.15},${cy-s*.25} ${cx+s*.3},${cy+s*.5} ${cx-s*.3},${cy+s*.5}" fill="#fff" opacity=".25"></polygon>`,
+  hills:      (cx,cy,s)=>`<circle cx="${cx-s*.35}" cy="${cy+s*.2}" r="${s*.45}" fill="#8a7042" opacity=".45"></circle><circle cx="${cx+s*.35}" cy="${cy+s*.25}" r="${s*.4}" fill="#8a7042" opacity=".45"></circle>`,
+  water:      (cx,cy,s)=>`<path d="M ${cx-s*.7} ${cy} q ${s*.35} ${-s*.35}, ${s*.7} 0 t ${s*.7} 0" stroke="#1f3a3a" stroke-width="2" fill="none" opacity=".55"></path>`,
+  swamp:      (cx,cy,s)=>`<path d="M ${cx-s*.6} ${cy+s*.2} q ${s*.3} ${-s*.4}, ${s*.6} 0 t ${s*.6} 0" stroke="#2e2f1c" stroke-width="1.6" fill="none" opacity=".5"></path>`,
+  ruins:      (cx,cy,s)=>`<rect x="${cx-s*.45}" y="${cy-s*.1}" width="${s*.25}" height="${s*.65}" fill="#574a36" opacity=".55"></rect><rect x="${cx+s*.15}" y="${cy-s*.35}" width="${s*.22}" height="${s*.9}" fill="#574a36" opacity=".55"></rect>`,
+  settlement: (cx,cy,s)=>`<polygon points="${cx-s*.4},${cy+s*.45} ${cx-s*.4},${cy} ${cx},${cy-s*.45} ${cx+s*.4},${cy} ${cx+s*.4},${cy+s*.45}" fill="#3a2a16" opacity=".6"></polygon>`,
+
+  /* ── City / interior buildings ──────────────────────────── */
+  // house — residential building (rectangle body + triangle roof + door)
+  house: (cx,cy,s)=>`<rect x="${cx-s*.42}" y="${cy-s*.05}" width="${s*.84}" height="${s*.5}" fill="#574a36" opacity=".65"></rect><polygon points="${cx-s*.52},${cy-s*.05} ${cx},${cy-s*.58} ${cx+s*.52},${cy-s*.05}" fill="#3a2a16" opacity=".7"></polygon><rect x="${cx-s*.1}" y="${cy+s*.2}" width="${s*.2}" height="${s*.25}" fill="#241f1a" opacity=".5"></rect>`,
+  // bighouse — large building: manor, guild hall, castle keep
+  bighouse: (cx,cy,s)=>`<rect x="${cx-s*.55}" y="${cy-s*.05}" width="${s*1.1}" height="${s*.6}" fill="#574a36" opacity=".65"></rect><polygon points="${cx-s*.65},${cy-s*.05} ${cx},${cy-s*.7} ${cx+s*.65},${cy-s*.05}" fill="#3a2a16" opacity=".7"></polygon><rect x="${cx-s*.12}" y="${cy+s*.15}" width="${s*.24}" height="${s*.4}" fill="#241f1a" opacity=".5"></rect><rect x="${cx-s*.4}" y="${cy+s*.1}" width="${s*.18}" height="${s*.18}" fill="#241f1a" opacity=".35"></rect><rect x="${cx+s*.22}" y="${cy+s*.1}" width="${s*.18}" height="${s*.18}" fill="#241f1a" opacity=".35"></rect>`,
+  // shop — like a house with a coloured awning band across the front
+  shop: (cx,cy,s)=>`<rect x="${cx-s*.42}" y="${cy-s*.05}" width="${s*.84}" height="${s*.5}" fill="#574a36" opacity=".65"></rect><polygon points="${cx-s*.52},${cy-s*.05} ${cx},${cy-s*.58} ${cx+s*.52},${cy-s*.05}" fill="#3a2a16" opacity=".7"></polygon><rect x="${cx-s*.5}" y="${cy-s*.05}" width="${s}" height="${s*.16}" fill="#9c3b2e" opacity=".75"></rect><rect x="${cx-s*.1}" y="${cy+s*.2}" width="${s*.2}" height="${s*.25}" fill="#241f1a" opacity=".5"></rect>`,
+  // temple — classical pediment and columns
+  temple: (cx,cy,s)=>`<rect x="${cx-s*.45}" y="${cy}" width="${s*.9}" height="${s*.45}" fill="#c9c0a8" opacity=".7"></rect><polygon points="${cx-s*.55},${cy} ${cx},${cy-s*.55} ${cx+s*.55},${cy}" fill="#a8a090" opacity=".75"></polygon><line x1="${cx-s*.28}" y1="${cy}" x2="${cx-s*.28}" y2="${cy+s*.45}" stroke="#241f1a" stroke-width="2" opacity=".4"></line><line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy+s*.45}" stroke="#241f1a" stroke-width="2" opacity=".4"></line><line x1="${cx+s*.28}" y1="${cy}" x2="${cx+s*.28}" y2="${cy+s*.45}" stroke="#241f1a" stroke-width="2" opacity=".4"></line>`,
+
+  /* ── Cave / dungeon ─────────────────────────────────────── */
+  // chamber — open cavern space (dashed oval outline)
+  chamber: (cx,cy,s)=>`<ellipse cx="${cx}" cy="${cy+s*.1}" rx="${s*.55}" ry="${s*.42}" fill="none" stroke="#3a3020" stroke-width="2" stroke-dasharray="5,3" opacity=".65"></ellipse>`,
+  // passage — corridor (two parallel lines with end walls)
+  passage: (cx,cy,s)=>`<line x1="${cx-s*.7}" y1="${cy-s*.22}" x2="${cx+s*.7}" y2="${cy-s*.22}" stroke="#3a3020" stroke-width="2" opacity=".6"></line><line x1="${cx-s*.7}" y1="${cy+s*.22}" x2="${cx+s*.7}" y2="${cy+s*.22}" stroke="#3a3020" stroke-width="2" opacity=".6"></line><line x1="${cx-s*.7}" y1="${cy-s*.22}" x2="${cx-s*.7}" y2="${cy+s*.22}" stroke="#3a3020" stroke-width="1.5" opacity=".45"></line><line x1="${cx+s*.7}" y1="${cy-s*.22}" x2="${cx+s*.7}" y2="${cy+s*.22}" stroke="#3a3020" stroke-width="1.5" opacity=".45"></line>`,
+  // chasm — pit or drop (zigzag suggesting a sharp edge)
+  chasm: (cx,cy,s)=>`<polyline points="${cx-s*.6},${cy-s*.25} ${cx-s*.3},${cy+s*.35} ${cx},${cy-s*.15} ${cx+s*.3},${cy+s*.4} ${cx+s*.6},${cy-s*.15}" fill="none" stroke="#241f1a" stroke-width="2.5" stroke-linejoin="round" opacity=".65"></polyline><polyline points="${cx-s*.5},${cy-s*.25} ${cx-s*.25},${cy+s*.25} ${cx+s*.05},${cy-s*.05} ${cx+s*.3},${cy+s*.3} ${cx+s*.55},${cy-s*.1}" fill="none" stroke="#241f1a" stroke-width="1" opacity=".3"></polyline>`,
+  // stairs — descending steps
+  stairs: (cx,cy,s)=>`<rect x="${cx-s*.5}" y="${cy+s*.25}" width="${s}" height="${s*.18}" fill="#3a3020" opacity=".55"></rect><rect x="${cx-s*.35}" y="${cy+s*.05}" width="${s*.7}" height="${s*.18}" fill="#3a3020" opacity=".55"></rect><rect x="${cx-s*.2}" y="${cy-s*.15}" width="${s*.4}" height="${s*.18}" fill="#3a3020" opacity=".55"></rect>`,
+  // pool — still underground water (filled ellipse with ripple)
+  pool: (cx,cy,s)=>`<ellipse cx="${cx}" cy="${cy+s*.1}" rx="${s*.45}" ry="${s*.32}" fill="#1f3a3a" opacity=".65"></ellipse><path d="M ${cx-s*.28} ${cy+s*.1} q ${s*.14} ${-s*.16}, ${s*.28} 0 t ${s*.28} 0" stroke="#3f6363" stroke-width="1.5" fill="none" opacity=".7"></path>`,
+  // pillar — load-bearing column (rectangle with cap and base)
+  pillar: (cx,cy,s)=>`<rect x="${cx-s*.15}" y="${cy-s*.55}" width="${s*.3}" height="${s*.9}" fill="#574a36" opacity=".6"></rect><rect x="${cx-s*.22}" y="${cy-s*.55}" width="${s*.44}" height="${s*.1}" fill="#3a2a16" opacity=".65"></rect><rect x="${cx-s*.22}" y="${cy+s*.25}" width="${s*.44}" height="${s*.1}" fill="#3a2a16" opacity=".65"></rect>`,
 };
 
 function terrainIconMarkup(terrainDef,cx,cy){
@@ -761,6 +789,11 @@ function showHexDetail(hex){
     <div class="hd-rename"><input type="text" id="hexRenameInput" value="${escapeAttr(hex.name)}"><button class="btn ghost small" data-action="hex-rename">Rename</button></div>
     <div class="hd-section"><div class="hd-section-label">Known NPCs here</div>${npcsHere.length?npcsHere.map(n=>`<div class="hd-link">${escapeHtml(n.name)} \u2014 ${escapeHtml(n.profession)}</div>`).join(''):'<div class="hd-empty">No one recorded here yet.</div>'}</div>
     <div class="hd-section"><div class="hd-section-label">Quests tied here</div>${questsHere.length?questsHere.map(q=>`<div class="hd-link">${escapeHtml(q.title)} <span class="pill ${q.status}" style="margin-left:4px;">${q.status}</span></div>`).join(''):'<div class="hd-empty">Nothing tracked here yet.</div>'}</div>
+    <div class="hd-section">
+      <div class="hd-section-label">Notes</div>
+      <textarea id="hexNoteInput" style="width:100%;font-family:'Spectral',serif;font-size:13px;padding:6px 8px;border:1px solid var(--line);background:var(--parchment-panel);color:var(--ink);resize:vertical;min-height:58px;margin-top:2px;">${escapeHtml(hex.notes||'')}</textarea>
+      <button class="btn ghost small" data-action="hex-save-note" style="margin-top:5px;">Save Note</button>
+    </div>
   `;
 }
 
@@ -1695,6 +1728,11 @@ document.getElementById('hexDetail').addEventListener('click',e=>{
   if(btn.dataset.action==='hex-rename'){
     const val=document.getElementById('hexRenameInput')?.value.trim();
     if(val){ currentDetailHex.name=val; renderMap(); showHexDetail(currentDetailHex); }
+  }
+  else if (btn.dataset.action === 'hex-save-note') {
+      const noteVal = document.getElementById('hexNoteInput')?.value.trim();
+      currentDetailHex.notes = noteVal || '';
+      showHexDetail(currentDetailHex); // re-render to update view state
   }
 });
 
