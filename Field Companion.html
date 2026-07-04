@@ -442,7 +442,10 @@ const DEFAULT_SETTING_TEMPLATE = {
     {tag:'Rumour',   text:'Word reaches you of something happening elsewhere in the world.'},
     {tag:'Memory',   text:'Something here triggers a recollection you\u2019d rather not have.'}
   ],
-  tensionDefaults:{ startingValue:12, step:12, bleedTo:8, ceiling:95 }
+  tensionDefaults:{ startingValue:12, step:12, bleedTo:8, ceiling:95 },
+  /* Optional seed data — both may be empty, more can be added during play */
+  organisations: [],  // { id, name, description }
+  nations:       []   // { id, name, description }
 };
 
 /* ==========================================================
@@ -514,10 +517,12 @@ function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
 const state = {
   saveId: 'save_' + Math.random().toString(36).slice(2,10),
   activeMapId: null,
-  maps: [],        // { id, templateId, templateVersion, templateSnapshot, hexes:Map, current:{q,r} }
+  maps: [],
   tension: { value:12, step:12, bleedTo:8, ceiling:95, pending:[] },
   npcs: [],
   quests: [],
+  organisations: [],   // { id, name, description }
+  nations: [],         // { id, name, description }
   log: [],
   provenance: { settingTemplateId: DEFAULT_SETTING_TEMPLATE.templateId, settingTemplateVersion: DEFAULT_SETTING_TEMPLATE.templateVersion }
 };
@@ -857,7 +862,7 @@ function generateEvent(){
    Location is now { mapId, hexId } | null, shown as
    optgroup-grouped <select>.
    ========================================================== */
-let draftNpc=null, editingNpcId=null;
+let draftNpc=null, editingNpcId=null, editingOrgId=null, editingNationId=null;
 
 function parseLocVal(v){ if(!v) return null; const [m,h]=v.split('|'); return m&&h?{mapId:m,hexId:h}:null; }
 function locVal(loc){ return loc?.mapId&&loc?.hexId?`${loc.mapId}|${loc.hexId}`:''; }
@@ -896,9 +901,24 @@ function rollNpc(){
     name:pools.npcFirstNames[Math.floor(Math.random()*pools.npcFirstNames.length)]+' '+pools.npcSurnames[Math.floor(Math.random()*pools.npcSurnames.length)],
     profession:pools.professions[Math.floor(Math.random()*pools.professions.length)],
     trait:pools.traits[Math.floor(Math.random()*pools.traits.length)],
-    location:null, notes:'', tags:[], imageRef:null
+    location:null, notes:'', tags:[], orgIds:[], nationId:null, imageRef:null
   };
   renderDraft();
+}
+
+/* Shared affiliation picker used in both draft and edit forms */
+function affiliationPickerMarkup(selectedOrgIds, selectedNationId, mode){
+  // mode: 'draft' | 'edit'  (determines data-action attribute prefix)
+  const orgSection = state.organisations.length
+    ? `<div class="affil-pills">${state.organisations.map(o=>`
+        <button class="pill${(selectedOrgIds||[]).includes(o.id)?' active':''}"
+                data-action="${mode}-toggle-org" data-org-id="${o.id}">${escapeHtml(o.name)}</button>`).join('')}</div>`
+    : `<div class="hd-empty">No organisations defined yet &mdash; add some in the Orgs tab.</div>`;
+  const nationOptions = `<option value="">&mdash; none &mdash;</option>`
+    + state.nations.map(n=>`<option value="${n.id}"${n.id===selectedNationId?' selected':''}>${escapeHtml(n.name)}</option>`).join('');
+  return `
+    <div class="field"><label>Organisation affiliations</label>${orgSection}</div>
+    <div class="field"><label>Nation</label><select id="${mode}Nation">${nationOptions}</select></div>`;
 }
 
 function renderDraft(){
@@ -910,6 +930,7 @@ function renderDraft(){
       <div class="card-body">Quirk: ${escapeHtml(draftNpc.trait)}</div>
       <div class="field" style="margin-top:8px;"><label>Location</label><select id="draftLocation">${mapHexSelectOptions(null,null)}</select></div>
       <div class="field"><label>Tags (comma separated)</label><input type="text" id="draftTags" placeholder="merchant, ally..."></div>
+      ${affiliationPickerMarkup(draftNpc.orgIds, draftNpc.nationId, 'draft')}
       <div class="field"><label>Notes</label><textarea id="draftNotes" placeholder="Anything worth remembering..."></textarea></div>
       <div class="field"><label>Image URL (optional)</label><input type="url" id="draftImageUrl" placeholder="https://..."><div class="hint">Or upload a local file below.</div></div>
       <div class="field"><label>Upload local image</label><input type="file" id="draftImage" accept="image/*"></div>
@@ -924,6 +945,7 @@ function renderDraft(){
 function saveDraftNpc(){
   draftNpc.location=parseLocVal(document.getElementById('draftLocation').value);
   draftNpc.tags=document.getElementById('draftTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  draftNpc.nationId=document.getElementById('draftNation').value||null;
   draftNpc.notes=document.getElementById('draftNotes').value.trim();
   const url=document.getElementById('draftImageUrl').value.trim();
   if(url) draftNpc.imageRef={type:'url',value:url};
@@ -940,11 +962,17 @@ function renderRoster(){
 function npcCardMarkup(n){
   const img=n.imageRef?.value;
   const locStr=npcLocationName(n);
+  const orgNames=(n.orgIds||[]).map(id=>state.organisations.find(o=>o.id===id)?.name).filter(Boolean);
+  const nationName=n.nationId?state.nations.find(x=>x.id===n.nationId)?.name:null;
+  const affiliationStr=[...(nationName?[nationName]:[]),...orgNames].map(escapeHtml).join(' \u00b7 ');
   return `<div class="card">
     <div class="card-head">
       <div style="display:flex;gap:9px;align-items:flex-start;">
         ${img?`<img class="thumb" src="${escapeAttr(img)}">`:`<div class="thumb" style="display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;color:var(--brass-deep);">${escapeHtml(n.name.charAt(0))}</div>`}
-        <div><div class="card-title">${escapeHtml(n.name)}</div><div class="card-sub">${escapeHtml(n.profession)}${locStr?' \u00b7 '+locStr:''}</div></div>
+        <div>
+          <div class="card-title">${escapeHtml(n.name)}</div>
+          <div class="card-sub">${escapeHtml(n.profession)}${locStr?' \u00b7 '+locStr:''}${affiliationStr?' \u00b7 '+affiliationStr:''}</div>
+        </div>
       </div>
       <div class="card-actions" style="margin-top:0;">
         <button class="btn ghost small" data-action="npc-edit"   data-npc-id="${n.id}">Edit</button>
@@ -965,6 +993,7 @@ function npcEditMarkup(n){
     </div>
     <div class="field"><label>Location</label><select id="editLocation">${mapHexSelectOptions(n.location?.mapId,n.location?.hexId)}</select></div>
     <div class="field"><label>Tags (comma separated)</label><input type="text" id="editTags" value="${escapeAttr((n.tags||[]).join(', '))}"></div>
+    ${affiliationPickerMarkup(n.orgIds, n.nationId, 'edit')}
     <div class="field"><label>Notes</label><textarea id="editNotes">${escapeHtml(n.notes||'')}</textarea></div>
     <div class="field"><label>Image URL</label><input type="url" id="editImageUrl" value="${escapeAttr(n.imageRef?.type==='url'?n.imageRef.value:'')}" placeholder="https://..."></div>
     <div class="field"><label>Replace with local upload</label><input type="file" id="editImage" accept="image/*"></div>
@@ -982,6 +1011,8 @@ function saveEditNpc(id){
   n.trait=document.getElementById('editTrait').value.trim();
   n.location=parseLocVal(document.getElementById('editLocation').value);
   n.tags=document.getElementById('editTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  n.nationId=document.getElementById('editNation').value||null;
+  // orgIds are toggled in real-time via data-action; read from existing n.orgIds
   n.notes=document.getElementById('editNotes').value.trim();
   const url=document.getElementById('editImageUrl').value.trim();
   if(url) n.imageRef={type:'url',value:url};
@@ -1037,6 +1068,85 @@ function renderQuests(){
         <button class="btn ghost small" data-action="quest-remove" data-quest-id="${q.id}">Remove</button>
       </div>
     </div>`).join('');
+}
+
+/* ==========================================================
+   ORGANISATIONS & NATIONS
+   Simple { id, name, description } records. Started from the
+   setting template's seed arrays; players add more during play.
+   ========================================================== */
+function newEntityId(prefix){ return prefix+'_'+Math.random().toString(36).slice(2,9); }
+
+/* Shared card + edit markup for both entity types */
+function entityCardMarkup(type, entity){
+  return `<div class="card">
+    <div class="card-head">
+      <div class="card-title">${escapeHtml(entity.name)}</div>
+      <div class="card-actions" style="margin-top:0;">
+        <button class="btn ghost small" data-action="${type}-edit"   data-entity-id="${entity.id}">Edit</button>
+        <button class="btn ghost small" data-action="${type}-remove" data-entity-id="${entity.id}">Remove</button>
+      </div>
+    </div>
+    ${entity.description?`<div class="card-body">${escapeHtml(entity.description)}</div>`:''}
+  </div>`;
+}
+
+function entityEditMarkup(type, entity){
+  const isNew = !entity;
+  return `<div class="card" style="border-color:var(--brass);">
+    <div class="field"><label>Name</label><input type="text" class="${type}-edit-name" value="${escapeAttr(entity?.name||'')}" placeholder="${type==='org'?'Organisation':'Nation'} name"></div>
+    <div class="field"><label>Description</label><textarea class="${type}-edit-desc" placeholder="Brief description...">${escapeHtml(entity?.description||'')}</textarea></div>
+    <div class="card-actions">
+      <button class="btn primary small" data-action="${type}-save" data-entity-id="${entity?.id||''}">Save</button>
+      <button class="btn ghost small"   data-action="${type}-cancel">Cancel</button>
+    </div>
+  </div>`;
+}
+
+function renderOrgs(){
+  const el=document.getElementById('orgList'); if(!el) return;
+  const addBtn=`<div style="margin-bottom:10px;"><button class="btn primary small" data-action="org-add">+ Add Organisation</button></div>`;
+  const newForm=editingOrgId==='new'?entityEditMarkup('org',null):'';
+  const cards=state.organisations.map(o=>o.id===editingOrgId?entityEditMarkup('org',o):entityCardMarkup('org',o)).join('');
+  el.innerHTML=addBtn+newForm+(cards||(!editingOrgId?'<div class="empty-state">No organisations yet.</div>':''));
+}
+
+function renderNations(){
+  const el=document.getElementById('nationList'); if(!el) return;
+  const addBtn=`<div style="margin-bottom:10px;"><button class="btn primary small" data-action="nation-add">+ Add Nation</button></div>`;
+  const newForm=editingNationId==='new'?entityEditMarkup('nation',null):'';
+  const cards=state.nations.map(n=>n.id===editingNationId?entityEditMarkup('nation',n):entityCardMarkup('nation',n)).join('');
+  el.innerHTML=addBtn+newForm+(cards||(!editingNationId?'<div class="empty-state">No nations yet.</div>':''));
+}
+
+function saveOrg(entityId){
+  const nameEl=document.querySelector('#orgList .org-edit-name');
+  const descEl=document.querySelector('#orgList .org-edit-desc');
+  const name=(nameEl?.value||'').trim(); if(!name) return;
+  if(entityId){
+    const o=state.organisations.find(x=>x.id===entityId);
+    if(o){ o.name=name; o.description=(descEl?.value||'').trim(); }
+  } else {
+    state.organisations.push({ id:newEntityId('org'), name, description:(descEl?.value||'').trim() });
+  }
+  editingOrgId=null;
+  renderOrgs();
+  renderDraft(); renderRoster(); // refresh affiliation pickers
+}
+
+function saveNation(entityId){
+  const nameEl=document.querySelector('#nationList .nation-edit-name');
+  const descEl=document.querySelector('#nationList .nation-edit-desc');
+  const name=(nameEl?.value||'').trim(); if(!name) return;
+  if(entityId){
+    const n=state.nations.find(x=>x.id===entityId);
+    if(n){ n.name=name; n.description=(descEl?.value||'').trim(); }
+  } else {
+    state.nations.push({ id:newEntityId('nat'), name, description:(descEl?.value||'').trim() });
+  }
+  editingNationId=null;
+  renderNations();
+  renderDraft(); renderRoster(); // refresh affiliation pickers
 }
 
 /* ==========================================================
@@ -1160,6 +1270,16 @@ function validateSettingTemplate(obj){
   const errors = runSchema(obj, SETTING_SCHEMA);
   if(obj.genericEncounters !== undefined)
     errors.push(...checkEncounterArray(obj.genericEncounters, 'genericEncounters'));
+  // organisations and nations are optional; validate items if present
+  for(const key of ['organisations','nations']){
+    if(obj[key] !== undefined){
+      if(!Array.isArray(obj[key])) errors.push(`"${key}", if present, must be an array.`);
+      else obj[key].forEach((item,i) => {
+        if(!isPlainObject(item)||typeof item.name!=='string'||!item.name.trim())
+          errors.push(`${key}[${i}] must have a non-empty "name" string.`);
+      });
+    }
+  }
   return {valid: errors.length === 0, errors};
 }
 
@@ -1391,6 +1511,8 @@ function renderAll(resetUI=false){
   renderDraft();
   renderRoster();
   renderQuests();
+  renderOrgs();
+  renderNations();
 }
 
 /* ==========================================================
@@ -1436,6 +1558,8 @@ document.getElementById('btnStartNewGame').onclick=()=>{
   state.maps=[firstMap]; state.activeMapId=firstMap.id;
   state.tension={value:td.startingValue,step:12,bleedTo:td.bleedTo,ceiling:td.ceiling,pending:[]};
   state.npcs=[]; state.quests=[]; state.log=[];
+  state.organisations=deepClone(content.organisations||[]);
+  state.nations=deepClone(content.nations||[]);
   state.provenance={settingTemplateId:content.templateId||'custom',settingTemplateVersion:content.templateVersion||1};
   SIZE=mapTpl.hexSize||30;
   document.getElementById('newGameDialog').close(); hideError(); renderAll(true);
@@ -1454,8 +1578,8 @@ document.getElementById('fileLoadMap').addEventListener('change',async e=>{
   const mapEntry=createMapEntry(r.data);
   state.maps.push(mapEntry);
   switchToMap(mapEntry.id);
-  // Refresh panels that include cross-map location data
-  renderDraft(); renderRoster(); renderQuests();
+  // Refresh panels that include cross-map location data or affiliation pickers
+  renderDraft(); renderRoster(); renderQuests(); renderOrgs(); renderNations();
 });
 
 /* ==========================================================
@@ -1477,8 +1601,10 @@ document.getElementById('fileLoadGame').addEventListener('change',async e=>{
   }));
   state.activeMapId=data.activeMapId;
   state.tension={value:data.tension.value,step:data.tension.step||12,bleedTo:data.tension.bleedTo||8,ceiling:data.tension.ceiling||95,pending:data.tension.pending||[]};
-  state.npcs=(data.npcs||[]).map(n=>({...n,tags:n.tags||[]}));
+  state.npcs=(data.npcs||[]).map(n=>({...n,tags:n.tags||[],orgIds:n.orgIds||[],nationId:n.nationId||null}));
   state.quests=data.quests||[];
+  state.organisations=data.organisations||[];
+  state.nations=data.nations||[];
   state.log=(data.eventLog||[]).map(e=>({tag:e.tag,text:e.text,t:e.timestamp?Date.parse(e.timestamp):Date.now()}));
   state.provenance=data.provenance||{};
   SIZE=activeSnap().hexSize||30;
@@ -1497,6 +1623,7 @@ document.getElementById('btnSaveGame').onclick=()=>{
     activeMapId:state.activeMapId,
     maps:state.maps.map(m=>({id:m.id,templateId:m.templateId,templateVersion:m.templateVersion,templateSnapshot:m.templateSnapshot,hexes:[...m.hexes.values()],current:m.current})),
     tension:state.tension, npcs:state.npcs, quests:state.quests,
+    organisations:state.organisations, nations:state.nations,
     eventLog:state.log.map(e=>({id:'evt_'+Math.random().toString(36).slice(2,9),timestamp:new Date(e.t).toISOString(),tag:e.tag,text:e.text}))
   };
   const name=(content.meta?.name||'save').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
@@ -1574,19 +1701,37 @@ document.getElementById('hexDetail').addEventListener('click',e=>{
 // NPC draft
 document.getElementById('npcDraft').addEventListener('click',e=>{
   const btn=e.target.closest('[data-action]'); if(!btn) return;
-  if(btn.dataset.action==='npc-save-draft')  saveDraftNpc();
-  else if(btn.dataset.action==='npc-reroll') rollNpc();
-  else if(btn.dataset.action==='npc-discard'){ draftNpc=null; renderDraft(); }
+  const {action}=btn.dataset;
+  if(action==='npc-save-draft')  saveDraftNpc();
+  else if(action==='npc-reroll') rollNpc();
+  else if(action==='npc-discard'){ draftNpc=null; renderDraft(); }
+  else if(action==='draft-toggle-org' && draftNpc){
+    const id=btn.dataset.orgId;
+    const idx=(draftNpc.orgIds||[]).indexOf(id);
+    if(!draftNpc.orgIds) draftNpc.orgIds=[];
+    idx>=0 ? draftNpc.orgIds.splice(idx,1) : draftNpc.orgIds.push(id);
+    renderDraft();
+  }
 });
 
 // NPC roster
 document.getElementById('npcRoster').addEventListener('click',e=>{
   const btn=e.target.closest('[data-action]'); if(!btn) return;
   const {action}=btn.dataset, id=btn.dataset.npcId;
-  if(action==='npc-edit')          { editingNpcId=id; renderRoster(); }
-  else if(action==='npc-remove')   { state.npcs=state.npcs.filter(n=>n.id!==id); renderRoster(); }
-  else if(action==='npc-save-edit')  saveEditNpc(id);
+  if(action==='npc-edit')           { editingNpcId=id; renderRoster(); }
+  else if(action==='npc-remove')    { state.npcs=state.npcs.filter(n=>n.id!==id); renderRoster(); }
+  else if(action==='npc-save-edit')   saveEditNpc(id);
   else if(action==='npc-cancel-edit'){ editingNpcId=null; renderRoster(); }
+  else if(action==='edit-toggle-org'){
+    const npc=state.npcs.find(x=>x.id===btn.dataset.npcId||x.id===editingNpcId);
+    if(npc){
+      const orgId=btn.dataset.orgId;
+      if(!npc.orgIds) npc.orgIds=[];
+      const idx=npc.orgIds.indexOf(orgId);
+      idx>=0 ? npc.orgIds.splice(idx,1) : npc.orgIds.push(orgId);
+      renderRoster();
+    }
+  }
 });
 
 // Image uploads (change bubbles — covers both draftImage and editImage)
@@ -1621,11 +1766,38 @@ document.getElementById('questList').addEventListener('click',e=>{
   else if(action==='quest-remove'){ state.quests=state.quests.filter(q=>q.id!==qid); renderQuests(); }
 });
 
-// Tab switching
+// Organisations tab
+document.getElementById('orgList').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-action]'); if(!btn) return;
+  const {action}=btn.dataset, eid=btn.dataset.entityId;
+  if(action==='org-add')          { editingOrgId='new'; renderOrgs(); }
+  else if(action==='org-edit')    { editingOrgId=eid; renderOrgs(); }
+  else if(action==='org-remove')  { state.organisations=state.organisations.filter(o=>o.id!==eid); editingOrgId=null; renderOrgs(); renderDraft(); renderRoster(); }
+  else if(action==='org-save')    { saveOrg(eid||null); }
+  else if(action==='org-cancel')  { editingOrgId=null; renderOrgs(); }
+});
+
+// Nations tab
+document.getElementById('nationList').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-action]'); if(!btn) return;
+  const {action}=btn.dataset, eid=btn.dataset.entityId;
+  if(action==='nation-add')         { editingNationId='new'; renderNations(); }
+  else if(action==='nation-edit')   { editingNationId=eid; renderNations(); }
+  else if(action==='nation-remove') { state.nations=state.nations.filter(n=>n.id!==eid); editingNationId=null; renderNations(); renderDraft(); renderRoster(); }
+  else if(action==='nation-save')   { saveNation(eid||null); }
+  else if(action==='nation-cancel') { editingNationId=null; renderNations(); }
+});
+
+// Tab switching — scoped to the single .tabs container so it doesn't
+// accidentally catch any future tab bars elsewhere in the page
 document.querySelector('.tabs').addEventListener('click',e=>{
   const btn=e.target.closest('.tab-btn'); if(!btn) return;
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  // Only affect tabs within the same .tabs container as the clicked button
+  const container=btn.closest('.tabs');
+  const panel=btn.closest('.panel-body,.panel');
+  container.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  // Deactivate all sibling tab-panels within the same panel body
+  panel.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
 });

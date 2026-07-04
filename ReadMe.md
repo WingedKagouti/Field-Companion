@@ -65,7 +65,7 @@ You can use the SettingTemplate.json and MapTemplate.json files as a basis for y
 This software and its asset templates are released under a modified permissive license:
 
 *   **Modification and Derivative Works:** You are free to copy, modify, distribute, and build upon this software, its templates, or its underlying structures for any purpose, including commercial products (such as your own commercial TTRPG settings, custom modules, or derivative toolkits built using or adapting the template structures).
-*   **Original Software Restriction:** You may not sell, redistribute for profit, or commercialize the original, unmodified `Field Companion.html` codebase, `MapTemplate.json`, and/or `SettingTemplate.json` as standalone products. 
+*   **Original Software Restriction:** You may not sell, redistribute for profit, or commercialize the original, unmodified `Field Companion.html` codebase, `MapTemplate.json`, `Authored Map Example.json`, and/or `SettingTemplate.json` as standalone products. 
 *   **Attribution:** Any derivative works must include a credit line acknowledging this original project.
 
 *THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*
