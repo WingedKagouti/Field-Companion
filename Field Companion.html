@@ -331,7 +331,8 @@
           </div>
           <div class="tab-panel" id="tab-quests">
             <div class="row" style="margin-bottom:10px;">
-              <button class="btn primary" id="btnGenQuest" style="flex:1;">Generate Quest Hook</button>
+              <button class="btn primary" id="btnGenQuest" style="flex:1;">Generate Hook</button>
+              <button class="btn ghost"   id="btnAddQuest" style="flex:1;">Add Manually</button>
             </div>
             <div id="questList"><div class="empty-state">No quests yet.</div></div>
           </div>
@@ -654,6 +655,11 @@ function nameForHex(hex, snap){
 /* ==========================================================
    BUILT-IN ICON SHAPES
    Referenced by terrainDef.icon; terrainDef.iconUrl takes precedence.
+   Each function receives (cx, cy, s, col) where col is
+   terrainDef.iconColor — the primary icon colour set in the Map
+   Template.  Every shape falls back to its original hardcoded
+   colour when iconColor is absent, so existing templates need no
+   changes to keep working.
 
    Wilderness:  plains, forest, hills, mountains, water, swamp, ruins, settlement
    City / interior buildings:  house, bighouse, shop, temple
@@ -662,37 +668,37 @@ function nameForHex(hex, snap){
 const ICON_SHAPES = {
   /* ── Wilderness ─────────────────────────────────────────── */
   plains:     ()=>'',
-  forest:     (cx,cy,s)=>`<polygon points="${cx},${cy-s} ${cx-s*.6},${cy+s*.5} ${cx+s*.6},${cy+s*.5}" fill="#3f4a30" opacity=".55"></polygon>`,
-  mountains:  (cx,cy,s)=>`<polygon points="${cx-s*.7},${cy+s*.5} ${cx},${cy-s} ${cx+s*.7},${cy+s*.5}" fill="#4a4038" opacity=".5"></polygon><polygon points="${cx-s*.15},${cy-s*.25} ${cx+s*.15},${cy-s*.25} ${cx+s*.3},${cy+s*.5} ${cx-s*.3},${cy+s*.5}" fill="#fff" opacity=".25"></polygon>`,
-  hills:      (cx,cy,s)=>`<circle cx="${cx-s*.35}" cy="${cy+s*.2}" r="${s*.45}" fill="#8a7042" opacity=".45"></circle><circle cx="${cx+s*.35}" cy="${cy+s*.25}" r="${s*.4}" fill="#8a7042" opacity=".45"></circle>`,
-  water:      (cx,cy,s)=>`<path d="M ${cx-s*.7} ${cy} q ${s*.35} ${-s*.35}, ${s*.7} 0 t ${s*.7} 0" stroke="#1f3a3a" stroke-width="2" fill="none" opacity=".55"></path>`,
-  swamp:      (cx,cy,s)=>`<path d="M ${cx-s*.6} ${cy+s*.2} q ${s*.3} ${-s*.4}, ${s*.6} 0 t ${s*.6} 0" stroke="#2e2f1c" stroke-width="1.6" fill="none" opacity=".5"></path>`,
-  ruins:      (cx,cy,s)=>`<rect x="${cx-s*.45}" y="${cy-s*.1}" width="${s*.25}" height="${s*.65}" fill="#574a36" opacity=".55"></rect><rect x="${cx+s*.15}" y="${cy-s*.35}" width="${s*.22}" height="${s*.9}" fill="#574a36" opacity=".55"></rect>`,
-  settlement: (cx,cy,s)=>`<polygon points="${cx-s*.4},${cy+s*.45} ${cx-s*.4},${cy} ${cx},${cy-s*.45} ${cx+s*.4},${cy} ${cx+s*.4},${cy+s*.45}" fill="#3a2a16" opacity=".6"></polygon>`,
+  forest:     (cx,cy,s,col)=>`<polygon points="${cx},${cy-s} ${cx-s*.6},${cy+s*.5} ${cx+s*.6},${cy+s*.5}" fill="${col||'#3f4a30'}" opacity=".55"></polygon>`,
+  mountains:  (cx,cy,s,col)=>`<polygon points="${cx-s*.7},${cy+s*.5} ${cx},${cy-s} ${cx+s*.7},${cy+s*.5}" fill="${col||'#4a4038'}" opacity=".5"></polygon><polygon points="${cx-s*.15},${cy-s*.25} ${cx+s*.15},${cy-s*.25} ${cx+s*.3},${cy+s*.5} ${cx-s*.3},${cy+s*.5}" fill="#fff" opacity=".25"></polygon>`,
+  hills:      (cx,cy,s,col)=>`<circle cx="${cx-s*.35}" cy="${cy+s*.2}" r="${s*.45}" fill="${col||'#8a7042'}" opacity=".45"></circle><circle cx="${cx+s*.35}" cy="${cy+s*.25}" r="${s*.4}" fill="${col||'#8a7042'}" opacity=".45"></circle>`,
+  water:      (cx,cy,s,col)=>`<path d="M ${cx-s*.7} ${cy} q ${s*.35} ${-s*.35}, ${s*.7} 0 t ${s*.7} 0" stroke="${col||'#1f3a3a'}" stroke-width="2" fill="none" opacity=".55"></path>`,
+  swamp:      (cx,cy,s,col)=>`<path d="M ${cx-s*.6} ${cy+s*.2} q ${s*.3} ${-s*.4}, ${s*.6} 0 t ${s*.6} 0" stroke="${col||'#2e2f1c'}" stroke-width="1.6" fill="none" opacity=".5"></path>`,
+  ruins:      (cx,cy,s,col)=>`<rect x="${cx-s*.45}" y="${cy-s*.1}" width="${s*.25}" height="${s*.65}" fill="${col||'#574a36'}" opacity=".55"></rect><rect x="${cx+s*.15}" y="${cy-s*.35}" width="${s*.22}" height="${s*.9}" fill="${col||'#574a36'}" opacity=".55"></rect>`,
+  settlement: (cx,cy,s,col)=>`<polygon points="${cx-s*.4},${cy+s*.45} ${cx-s*.4},${cy} ${cx},${cy-s*.45} ${cx+s*.4},${cy} ${cx+s*.4},${cy+s*.45}" fill="${col||'#3a2a16'}" opacity=".6"></polygon>`,
 
   /* ── City / interior buildings ──────────────────────────── */
-  // house — residential building (rectangle body + triangle roof + door)
-  house: (cx,cy,s)=>`<rect x="${cx-s*.42}" y="${cy-s*.05}" width="${s*.84}" height="${s*.5}" fill="#574a36" opacity=".65"></rect><polygon points="${cx-s*.52},${cy-s*.05} ${cx},${cy-s*.58} ${cx+s*.52},${cy-s*.05}" fill="#3a2a16" opacity=".7"></polygon><rect x="${cx-s*.1}" y="${cy+s*.2}" width="${s*.2}" height="${s*.25}" fill="#241f1a" opacity=".5"></rect>`,
-  // bighouse — large building: manor, guild hall, castle keep
-  bighouse: (cx,cy,s)=>`<rect x="${cx-s*.55}" y="${cy-s*.05}" width="${s*1.1}" height="${s*.6}" fill="#574a36" opacity=".65"></rect><polygon points="${cx-s*.65},${cy-s*.05} ${cx},${cy-s*.7} ${cx+s*.65},${cy-s*.05}" fill="#3a2a16" opacity=".7"></polygon><rect x="${cx-s*.12}" y="${cy+s*.15}" width="${s*.24}" height="${s*.4}" fill="#241f1a" opacity=".5"></rect><rect x="${cx-s*.4}" y="${cy+s*.1}" width="${s*.18}" height="${s*.18}" fill="#241f1a" opacity=".35"></rect><rect x="${cx+s*.22}" y="${cy+s*.1}" width="${s*.18}" height="${s*.18}" fill="#241f1a" opacity=".35"></rect>`,
-  // shop — like a house with a coloured awning band across the front
-  shop: (cx,cy,s)=>`<rect x="${cx-s*.42}" y="${cy-s*.05}" width="${s*.84}" height="${s*.5}" fill="#574a36" opacity=".65"></rect><polygon points="${cx-s*.52},${cy-s*.05} ${cx},${cy-s*.58} ${cx+s*.52},${cy-s*.05}" fill="#3a2a16" opacity=".7"></polygon><rect x="${cx-s*.5}" y="${cy-s*.05}" width="${s}" height="${s*.16}" fill="#9c3b2e" opacity=".75"></rect><rect x="${cx-s*.1}" y="${cy+s*.2}" width="${s*.2}" height="${s*.25}" fill="#241f1a" opacity=".5"></rect>`,
-  // temple — classical pediment and columns
-  temple: (cx,cy,s)=>`<rect x="${cx-s*.45}" y="${cy}" width="${s*.9}" height="${s*.45}" fill="#c9c0a8" opacity=".7"></rect><polygon points="${cx-s*.55},${cy} ${cx},${cy-s*.55} ${cx+s*.55},${cy}" fill="#a8a090" opacity=".75"></polygon><line x1="${cx-s*.28}" y1="${cy}" x2="${cx-s*.28}" y2="${cy+s*.45}" stroke="#241f1a" stroke-width="2" opacity=".4"></line><line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy+s*.45}" stroke="#241f1a" stroke-width="2" opacity=".4"></line><line x1="${cx+s*.28}" y1="${cy}" x2="${cx+s*.28}" y2="${cy+s*.45}" stroke="#241f1a" stroke-width="2" opacity=".4"></line>`,
+  // house — walls use iconColor; roof and door keep structural darks
+  house:    (cx,cy,s,col)=>`<rect x="${cx-s*.42}" y="${cy-s*.05}" width="${s*.84}" height="${s*.5}" fill="${col||'#574a36'}" opacity=".65"></rect><polygon points="${cx-s*.52},${cy-s*.05} ${cx},${cy-s*.58} ${cx+s*.52},${cy-s*.05}" fill="#3a2a16" opacity=".7"></polygon><rect x="${cx-s*.1}" y="${cy+s*.2}" width="${s*.2}" height="${s*.25}" fill="#241f1a" opacity=".5"></rect>`,
+  // bighouse — walls use iconColor
+  bighouse: (cx,cy,s,col)=>`<rect x="${cx-s*.55}" y="${cy-s*.05}" width="${s*1.1}" height="${s*.6}" fill="${col||'#574a36'}" opacity=".65"></rect><polygon points="${cx-s*.65},${cy-s*.05} ${cx},${cy-s*.7} ${cx+s*.65},${cy-s*.05}" fill="#3a2a16" opacity=".7"></polygon><rect x="${cx-s*.12}" y="${cy+s*.15}" width="${s*.24}" height="${s*.4}" fill="#241f1a" opacity=".5"></rect><rect x="${cx-s*.4}" y="${cy+s*.1}" width="${s*.18}" height="${s*.18}" fill="#241f1a" opacity=".35"></rect><rect x="${cx+s*.22}" y="${cy+s*.1}" width="${s*.18}" height="${s*.18}" fill="#241f1a" opacity=".35"></rect>`,
+  // shop — walls use iconColor; awning colour stays rust (structural to the concept)
+  shop:     (cx,cy,s,col)=>`<rect x="${cx-s*.42}" y="${cy-s*.05}" width="${s*.84}" height="${s*.5}" fill="${col||'#574a36'}" opacity=".65"></rect><polygon points="${cx-s*.52},${cy-s*.05} ${cx},${cy-s*.58} ${cx+s*.52},${cy-s*.05}" fill="#3a2a16" opacity=".7"></polygon><rect x="${cx-s*.5}" y="${cy-s*.05}" width="${s}" height="${s*.16}" fill="#9c3b2e" opacity=".75"></rect><rect x="${cx-s*.1}" y="${cy+s*.2}" width="${s*.2}" height="${s*.25}" fill="#241f1a" opacity=".5"></rect>`,
+  // temple — body/columns use iconColor
+  temple:   (cx,cy,s,col)=>`<rect x="${cx-s*.45}" y="${cy}" width="${s*.9}" height="${s*.45}" fill="${col||'#c9c0a8'}" opacity=".7"></rect><polygon points="${cx-s*.55},${cy} ${cx},${cy-s*.55} ${cx+s*.55},${cy}" fill="#a8a090" opacity=".75"></polygon><line x1="${cx-s*.28}" y1="${cy}" x2="${cx-s*.28}" y2="${cy+s*.45}" stroke="#241f1a" stroke-width="2" opacity=".4"></line><line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy+s*.45}" stroke="#241f1a" stroke-width="2" opacity=".4"></line><line x1="${cx+s*.28}" y1="${cy}" x2="${cx+s*.28}" y2="${cy+s*.45}" stroke="#241f1a" stroke-width="2" opacity=".4"></line>`,
 
   /* ── Cave / dungeon ─────────────────────────────────────── */
-  // chamber — open cavern space (dashed oval outline)
-  chamber: (cx,cy,s)=>`<ellipse cx="${cx}" cy="${cy+s*.1}" rx="${s*.55}" ry="${s*.42}" fill="none" stroke="#3a3020" stroke-width="2" stroke-dasharray="5,3" opacity=".65"></ellipse>`,
-  // passage — corridor (two parallel lines with end walls)
-  passage: (cx,cy,s)=>`<line x1="${cx-s*.7}" y1="${cy-s*.22}" x2="${cx+s*.7}" y2="${cy-s*.22}" stroke="#3a3020" stroke-width="2" opacity=".6"></line><line x1="${cx-s*.7}" y1="${cy+s*.22}" x2="${cx+s*.7}" y2="${cy+s*.22}" stroke="#3a3020" stroke-width="2" opacity=".6"></line><line x1="${cx-s*.7}" y1="${cy-s*.22}" x2="${cx-s*.7}" y2="${cy+s*.22}" stroke="#3a3020" stroke-width="1.5" opacity=".45"></line><line x1="${cx+s*.7}" y1="${cy-s*.22}" x2="${cx+s*.7}" y2="${cy+s*.22}" stroke="#3a3020" stroke-width="1.5" opacity=".45"></line>`,
-  // chasm — pit or drop (zigzag suggesting a sharp edge)
-  chasm: (cx,cy,s)=>`<polyline points="${cx-s*.6},${cy-s*.25} ${cx-s*.3},${cy+s*.35} ${cx},${cy-s*.15} ${cx+s*.3},${cy+s*.4} ${cx+s*.6},${cy-s*.15}" fill="none" stroke="#241f1a" stroke-width="2.5" stroke-linejoin="round" opacity=".65"></polyline><polyline points="${cx-s*.5},${cy-s*.25} ${cx-s*.25},${cy+s*.25} ${cx+s*.05},${cy-s*.05} ${cx+s*.3},${cy+s*.3} ${cx+s*.55},${cy-s*.1}" fill="none" stroke="#241f1a" stroke-width="1" opacity=".3"></polyline>`,
-  // stairs — descending steps
-  stairs: (cx,cy,s)=>`<rect x="${cx-s*.5}" y="${cy+s*.25}" width="${s}" height="${s*.18}" fill="#3a3020" opacity=".55"></rect><rect x="${cx-s*.35}" y="${cy+s*.05}" width="${s*.7}" height="${s*.18}" fill="#3a3020" opacity=".55"></rect><rect x="${cx-s*.2}" y="${cy-s*.15}" width="${s*.4}" height="${s*.18}" fill="#3a3020" opacity=".55"></rect>`,
-  // pool — still underground water (filled ellipse with ripple)
-  pool: (cx,cy,s)=>`<ellipse cx="${cx}" cy="${cy+s*.1}" rx="${s*.45}" ry="${s*.32}" fill="#1f3a3a" opacity=".65"></ellipse><path d="M ${cx-s*.28} ${cy+s*.1} q ${s*.14} ${-s*.16}, ${s*.28} 0 t ${s*.28} 0" stroke="#3f6363" stroke-width="1.5" fill="none" opacity=".7"></path>`,
-  // pillar — load-bearing column (rectangle with cap and base)
-  pillar: (cx,cy,s)=>`<rect x="${cx-s*.15}" y="${cy-s*.55}" width="${s*.3}" height="${s*.9}" fill="#574a36" opacity=".6"></rect><rect x="${cx-s*.22}" y="${cy-s*.55}" width="${s*.44}" height="${s*.1}" fill="#3a2a16" opacity=".65"></rect><rect x="${cx-s*.22}" y="${cy+s*.25}" width="${s*.44}" height="${s*.1}" fill="#3a2a16" opacity=".65"></rect>`,
+  // chamber — outline stroke uses iconColor
+  chamber: (cx,cy,s,col)=>`<ellipse cx="${cx}" cy="${cy+s*.1}" rx="${s*.55}" ry="${s*.42}" fill="none" stroke="${col||'#3a3020'}" stroke-width="2" stroke-dasharray="5,3" opacity=".65"></ellipse>`,
+  // passage — all strokes use iconColor
+  passage: (cx,cy,s,col)=>`<line x1="${cx-s*.7}" y1="${cy-s*.22}" x2="${cx+s*.7}" y2="${cy-s*.22}" stroke="${col||'#3a3020'}" stroke-width="2" opacity=".6"></line><line x1="${cx-s*.7}" y1="${cy+s*.22}" x2="${cx+s*.7}" y2="${cy+s*.22}" stroke="${col||'#3a3020'}" stroke-width="2" opacity=".6"></line><line x1="${cx-s*.7}" y1="${cy-s*.22}" x2="${cx-s*.7}" y2="${cy+s*.22}" stroke="${col||'#3a3020'}" stroke-width="1.5" opacity=".45"></line><line x1="${cx+s*.7}" y1="${cy-s*.22}" x2="${cx+s*.7}" y2="${cy+s*.22}" stroke="${col||'#3a3020'}" stroke-width="1.5" opacity=".45"></line>`,
+  // chasm — primary zigzag uses iconColor; faint echo stays dark
+  chasm:   (cx,cy,s,col)=>`<polyline points="${cx-s*.6},${cy-s*.25} ${cx-s*.3},${cy+s*.35} ${cx},${cy-s*.15} ${cx+s*.3},${cy+s*.4} ${cx+s*.6},${cy-s*.15}" fill="none" stroke="${col||'#241f1a'}" stroke-width="2.5" stroke-linejoin="round" opacity=".65"></polyline><polyline points="${cx-s*.5},${cy-s*.25} ${cx-s*.25},${cy+s*.25} ${cx+s*.05},${cy-s*.05} ${cx+s*.3},${cy+s*.3} ${cx+s*.55},${cy-s*.1}" fill="none" stroke="#241f1a" stroke-width="1" opacity=".3"></polyline>`,
+  // stairs — step fill uses iconColor
+  stairs:  (cx,cy,s,col)=>`<rect x="${cx-s*.5}" y="${cy+s*.25}" width="${s}" height="${s*.18}" fill="${col||'#3a3020'}" opacity=".55"></rect><rect x="${cx-s*.35}" y="${cy+s*.05}" width="${s*.7}" height="${s*.18}" fill="${col||'#3a3020'}" opacity=".55"></rect><rect x="${cx-s*.2}" y="${cy-s*.15}" width="${s*.4}" height="${s*.18}" fill="${col||'#3a3020'}" opacity=".55"></rect>`,
+  // pool — ellipse fill uses iconColor; ripple stroke uses a fixed teal complement
+  pool:    (cx,cy,s,col)=>`<ellipse cx="${cx}" cy="${cy+s*.1}" rx="${s*.45}" ry="${s*.32}" fill="${col||'#1f3a3a'}" opacity=".65"></ellipse><path d="M ${cx-s*.28} ${cy+s*.1} q ${s*.14} ${-s*.16}, ${s*.28} 0 t ${s*.28} 0" stroke="#3f6363" stroke-width="1.5" fill="none" opacity=".7"></path>`,
+  // pillar — shaft uses iconColor; cap and base keep structural dark
+  pillar:  (cx,cy,s,col)=>`<rect x="${cx-s*.15}" y="${cy-s*.55}" width="${s*.3}" height="${s*.9}" fill="${col||'#574a36'}" opacity=".6"></rect><rect x="${cx-s*.22}" y="${cy-s*.55}" width="${s*.44}" height="${s*.1}" fill="#3a2a16" opacity=".65"></rect><rect x="${cx-s*.22}" y="${cy+s*.25}" width="${s*.44}" height="${s*.1}" fill="#3a2a16" opacity=".65"></rect>`,
 };
 
 function terrainIconMarkup(terrainDef,cx,cy){
@@ -702,7 +708,7 @@ function terrainIconMarkup(terrainDef,cx,cy){
     return `<image href="${escapeAttr(terrainDef.iconUrl)}" x="${cx-SIZE+pad}" y="${cy-SIZE+pad}" width="${(SIZE-pad)*2}" height="${(SIZE-pad)*2}" preserveAspectRatio="xMidYMid meet" opacity=".85"></image>`;
   }
   const fn=ICON_SHAPES[terrainDef.icon];
-  return fn ? fn(cx,cy,s) : '';
+  return fn ? fn(cx,cy,s,terrainDef.iconColor||null) : '';
 }
 
 /* ==========================================================
@@ -800,10 +806,14 @@ function showHexDetail(hex){
   const tLabel=snap.terrain?.[hex.terrain]?.label||hex.terrain;
   const npcsHere  =state.npcs.filter(n=>n.location?.mapId===map.id&&n.location?.hexId===hex.id);
   const questsHere=state.quests.filter(q=>q.location?.mapId===map.id&&q.location?.hexId===hex.id);
+  const terrainOptions=Object.entries(snap.terrain||{})
+    .map(([k,t])=>`<option value="${k}"${k===hex.terrain?' selected':''}>${escapeHtml(t.label)}</option>`)
+    .join('');
   el.innerHTML=`
     <div class="hd-title">${escapeHtml(hex.name)}${isCurrent?' <span class="pill active" style="margin-left:6px;">here</span>':''}</div>
     <div class="hd-meta">Hex ${hex.q},${hex.r} \u00b7 ${escapeHtml(tLabel)} \u00b7 ${escapeHtml(snap.meta?.name||'')}</div>
     <div class="hd-rename"><input type="text" id="hexRenameInput" value="${escapeAttr(hex.name)}"><button class="btn ghost small" data-action="hex-rename">Rename</button></div>
+    <div class="hd-rename" style="margin-top:6px;"><select id="hexTerrainSelect" style="flex:1;font-family:'Spectral',serif;font-size:13px;padding:5px 7px;border:1px solid var(--line);background:var(--parchment-panel);color:var(--ink);">${terrainOptions}</select><button class="btn ghost small" data-action="hex-change-terrain">Change Terrain</button></div>
     <div class="hd-section"><div class="hd-section-label">Known NPCs here</div>${npcsHere.length?npcsHere.map(n=>`<div class="hd-link">${escapeHtml(n.name)} \u2014 ${escapeHtml(n.profession)}</div>`).join(''):'<div class="hd-empty">No one recorded here yet.</div>'}</div>
     <div class="hd-section"><div class="hd-section-label">Quests tied here</div>${questsHere.length?questsHere.map(q=>`<div class="hd-link">${escapeHtml(q.title)} <span class="pill ${q.status}" style="margin-left:4px;">${q.status}</span></div>`).join(''):'<div class="hd-empty">Nothing tracked here yet.</div>'}</div>
     <div class="hd-section">
@@ -912,7 +922,7 @@ function generateEvent(){
    Location is now { mapId, hexId } | null, shown as
    optgroup-grouped <select>.
    ========================================================== */
-let draftNpc=null, editingNpcId=null, editingOrgId=null, editingNationId=null;
+let draftNpc=null, editingNpcId=null, editingOrgId=null, editingNationId=null, editingQuestId=null;
 
 function parseLocVal(v){ if(!v) return null; const [m,h]=v.split('|'); return m&&h?{mapId:m,hexId:h}:null; }
 function locVal(loc){ return loc?.mapId&&loc?.hexId?`${loc.mapId}|${loc.hexId}`:''; }
@@ -1103,21 +1113,80 @@ function questPlaceName(q){
 
 function renderQuests(){
   const el=document.getElementById('questList');
-  if(!state.quests.length){ el.innerHTML='<div class="empty-state">No quests yet.</div>'; return; }
-  el.innerHTML=state.quests.map(q=>`
-    <div class="card">
-      <div class="card-head">
-        <div><div class="card-title">${escapeHtml(q.title)}</div><div class="card-sub">${escapeHtml(questPlaceName(q))}</div></div>
+  if(!state.quests.length && editingQuestId!=='new'){
+    el.innerHTML='<div class="empty-state">No quests yet.</div>'; return;
+  }
+  const newForm = editingQuestId==='new' ? questEditMarkup(null) : '';
+  el.innerHTML = newForm + state.quests.map(q=>
+    q.id===editingQuestId ? questEditMarkup(q) : questCardMarkup(q)
+  ).join('');
+}
+
+function questCardMarkup(q){
+  return `<div class="card">
+    <div class="card-head">
+      <div><div class="card-title">${escapeHtml(q.title)}</div><div class="card-sub">${escapeHtml(questPlaceName(q))}</div></div>
+      <div style="display:flex;align-items:center;gap:6px;">
         <span class="pill ${q.status}">${q.status}</span>
+        <button class="btn ghost small" data-action="quest-edit" data-quest-id="${q.id}">Edit</button>
       </div>
-      <div class="card-body">${escapeHtml(q.hook)}</div>
-      <div class="card-actions">
-        ${q.status!=='active' ?`<button class="btn ghost small" data-action="quest-status" data-quest-id="${q.id}" data-status="active">Mark Active</button>`:''}
-        ${q.status!=='done'   ?`<button class="btn ghost small" data-action="quest-status" data-quest-id="${q.id}" data-status="done">Mark Complete</button>`:''}
-        ${q.status!=='failed' ?`<button class="btn ghost small" data-action="quest-status" data-quest-id="${q.id}" data-status="failed">Mark Failed</button>`:''}
-        <button class="btn ghost small" data-action="quest-remove" data-quest-id="${q.id}">Remove</button>
-      </div>
-    </div>`).join('');
+    </div>
+    <div class="card-body">${escapeHtml(q.hook)}</div>
+    <div class="card-actions">
+      ${q.status!=='active' ?`<button class="btn ghost small" data-action="quest-status" data-quest-id="${q.id}" data-status="active">Mark Active</button>`:''}
+      ${q.status!=='done'   ?`<button class="btn ghost small" data-action="quest-status" data-quest-id="${q.id}" data-status="done">Mark Complete</button>`:''}
+      ${q.status!=='failed' ?`<button class="btn ghost small" data-action="quest-status" data-quest-id="${q.id}" data-status="failed">Mark Failed</button>`:''}
+      <button class="btn ghost small" data-action="quest-remove" data-quest-id="${q.id}">Remove</button>
+    </div>
+  </div>`;
+}
+
+function questEditMarkup(q){
+  /* q is null when creating a new quest */
+  const isNew=!q;
+  const npcOpts=`<option value="">\u2014 none \u2014</option>`
+    +state.npcs.map(n=>`<option value="${n.id}"${n.id===q?.npcId?' selected':''}>${escapeHtml(n.name)}</option>`).join('');
+  return `<div class="card" style="border-color:var(--brass);">
+    <div class="field"><label>Title</label><input type="text" id="questEditTitle" value="${escapeAttr(q?.title||'')}"></div>
+    <div class="field"><label>Description / Hook</label><textarea id="questEditHook" style="min-height:60px;">${escapeHtml(q?.hook||'')}</textarea></div>
+    <div class="row">
+      <div class="field"><label>Status</label><select id="questEditStatus">
+        <option value="active"${(!q||q.status==='active')?' selected':''}>Active</option>
+        <option value="done"${q?.status==='done'?' selected':''}>Complete</option>
+        <option value="failed"${q?.status==='failed'?' selected':''}>Failed</option>
+      </select></div>
+      <div class="field"><label>Linked NPC</label><select id="questEditNpc">${npcOpts}</select></div>
+    </div>
+    <div class="field"><label>Location</label><select id="questEditLocation">${mapHexSelectOptions(q?.location?.mapId,q?.location?.hexId)}</select></div>
+    <div class="card-actions">
+      <button class="btn primary small" data-action="${isNew?'quest-save-new':'quest-save-edit'}" data-quest-id="${q?.id||''}">Save</button>
+      <button class="btn ghost small"   data-action="quest-cancel-edit">Cancel</button>
+    </div>
+  </div>`;
+}
+
+function saveQuestEdit(id){
+  const q=state.quests.find(x=>x.id===id); if(!q) return;
+  q.title=document.getElementById('questEditTitle').value.trim()||q.title;
+  q.hook=document.getElementById('questEditHook').value.trim();
+  q.status=document.getElementById('questEditStatus').value;
+  q.npcId=document.getElementById('questEditNpc').value||null;
+  q.location=parseLocVal(document.getElementById('questEditLocation').value);
+  editingQuestId=null; renderQuests();
+}
+
+function saveNewQuest(){
+  const title=document.getElementById('questEditTitle').value.trim();
+  if(!title) return;
+  state.quests.unshift({
+    id:'q_'+Math.random().toString(36).slice(2,9),
+    title,
+    hook:document.getElementById('questEditHook').value.trim(),
+    status:document.getElementById('questEditStatus').value,
+    npcId:document.getElementById('questEditNpc').value||null,
+    location:parseLocVal(document.getElementById('questEditLocation').value)
+  });
+  editingQuestId=null; renderQuests();
 }
 
 /* ==========================================================
@@ -1301,8 +1370,9 @@ function checkTerrainEntries(terrain){
       { field:'label',   check:'nonEmptyString', msg:`terrain.${k}.label must be a non-empty string.`  },
       { field:'color',   check:'nonEmptyString', msg:`terrain.${k}.color must be a non-empty string.`  },
       { field:'weight',  check:'positiveNumber', msg:`terrain.${k}.weight must be a positive number.`  },
-      { field:'icon',    check:'string', optional:true, msg:`terrain.${k}.icon must be a string (built-in shape name).` },
-      { field:'iconUrl', check:'string', optional:true, msg:`terrain.${k}.iconUrl must be a string URL.`               },
+      { field:'icon',     check:'string', optional:true, msg:`terrain.${k}.icon must be a string (built-in shape name).` },
+      { field:'iconUrl',  check:'string', optional:true, msg:`terrain.${k}.iconUrl must be a string URL.`               },
+      { field:'iconColor',check:'string', optional:true, msg:`terrain.${k}.iconColor must be a CSS colour string (e.g. "#3f4a30").` },
     ]));
   }
   return errors;
@@ -1642,6 +1712,7 @@ document.getElementById('btnStartNewGame').onclick=()=>{
   state.saveId='save_'+Math.random().toString(36).slice(2,10);
   state.maps=[firstMap]; state.activeMapId=firstMap.id;
   state.tension={value:td.startingValue,step:12,bleedTo:td.bleedTo,ceiling:td.ceiling,pending:[]};
+  editingNpcId=null; editingOrgId=null; editingNationId=null; editingQuestId=null;
   state.npcs=[]; state.quests=[]; state.log=[]; state.journal='';
   state.organisations=deepClone(content.organisations||[]);
   state.nations=deepClone(content.nations||[]);
@@ -1794,6 +1865,9 @@ document.getElementById('hexDetail').addEventListener('click',e=>{
   if(btn.dataset.action==='hex-rename'){
     const val=document.getElementById('hexRenameInput')?.value.trim();
     if(val){ currentDetailHex.name=val; renderMap(); showHexDetail(currentDetailHex); }
+  } else if(btn.dataset.action==='hex-change-terrain'){
+    const val=document.getElementById('hexTerrainSelect')?.value;
+    if(val){ currentDetailHex.terrain=val; renderMap(); showHexDetail(currentDetailHex); }
   } else if(btn.dataset.action==='hex-save-note'){
     currentDetailHex.notes=document.getElementById('hexNoteInput')?.value||'';
     btn.textContent='Saved \u2713';
@@ -1865,9 +1939,15 @@ document.body.addEventListener('change', e => {
 document.getElementById('questList').addEventListener('click',e=>{
   const btn=e.target.closest('[data-action]'); if(!btn) return;
   const {action}=btn.dataset, qid=btn.dataset.questId;
-  if(action==='quest-status'){ const q=state.quests.find(q=>q.id===qid); if(q) q.status=btn.dataset.status; renderQuests(); }
-  else if(action==='quest-remove'){ state.quests=state.quests.filter(q=>q.id!==qid); renderQuests(); }
+  if(action==='quest-status')      { const q=state.quests.find(q=>q.id===qid); if(q) q.status=btn.dataset.status; renderQuests(); }
+  else if(action==='quest-remove') { state.quests=state.quests.filter(q=>q.id!==qid); renderQuests(); }
+  else if(action==='quest-edit')   { editingQuestId=qid; renderQuests(); }
+  else if(action==='quest-save-edit')  { saveQuestEdit(qid); }
+  else if(action==='quest-save-new')   { saveNewQuest(); }
+  else if(action==='quest-cancel-edit'){ editingQuestId=null; renderQuests(); }
 });
+
+document.getElementById('btnAddQuest').onclick=()=>{ editingQuestId='new'; renderQuests(); };
 
 // Organisations tab
 document.getElementById('orgList').addEventListener('click',e=>{
