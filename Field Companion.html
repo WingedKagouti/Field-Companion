@@ -148,6 +148,7 @@
 
   /* Dialog */
   dialog{border:1px solid var(--ink);background:var(--parchment-panel);box-shadow:5px 5px 0 rgba(36,31,26,.18);padding:0;max-width:480px;width:92vw;}
+  dialog.journal{max-width:680px;}
   dialog::backdrop{background:rgba(36,31,26,.45);}
   .dialog-head{padding:14px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--parchment-panel),var(--parchment-deep));}
   .dialog-head h3{font-family:'Fraunces',serif;font-size:18px;margin:0;}
@@ -204,6 +205,7 @@
         <button class="btn primary small" id="btnOpenNewGame">New Game</button>
         <button class="btn ghost small"   id="btnOpenLoadGame">Load Game</button>
         <button class="btn ghost small"   id="btnSaveGame">Save Game</button>
+        <button class="btn ghost small"   id="btnOpenJournal">Journal</button>
       </div>
       <div class="setting-chip">Setting: <b id="activeSettingLabel">The Hollow Reach</b></div>
     </div>
@@ -212,7 +214,21 @@
   <input type="file" id="fileLoadGame" accept="application/json,.json" style="display:none;">
   <input type="file" id="fileLoadMap"  accept="application/json,.json" style="display:none;">
 
-  <!-- NEW GAME DIALOG -->
+  <!-- JOURNAL DIALOG -->
+  <dialog id="journalDialog" class="journal">
+    <div class="dialog-head">
+      <h3>Journal</h3>
+    </div>
+    <div class="dialog-body">
+      <textarea id="journalText"
+        style="width:100%;height:min(60vh,480px);font-family:'Spectral',serif;font-size:14px;line-height:1.6;padding:10px 12px;border:1px solid var(--line);background:var(--parchment);color:var(--ink);resize:none;"
+        placeholder="Write here — session notes, narrative summaries, things to remember…"></textarea>
+      <div class="dialog-actions">
+        <button class="btn ghost small"   id="btnCancelJournal">Cancel</button>
+        <button class="btn primary small" id="btnSaveJournal">Save</button>
+      </div>
+    </div>
+  </dialog>
   <dialog id="newGameDialog">
     <div class="dialog-head"><h3>New Game</h3></div>
     <div class="dialog-body">
@@ -523,6 +539,7 @@ const state = {
   quests: [],
   organisations: [],   // { id, name, description }
   nations: [],         // { id, name, description }
+  journal: '',         // free-text player notes
   log: [],
   provenance: { settingTemplateId: DEFAULT_SETTING_TEMPLATE.templateId, settingTemplateVersion: DEFAULT_SETTING_TEMPLATE.templateVersion }
 };
@@ -1183,6 +1200,41 @@ function saveNation(entityId){
 }
 
 /* ==========================================================
+   DELETION HELPERS
+   Each one cleans up downstream references before re-rendering,
+   so no orphaned IDs are left in saved data.
+   ========================================================== */
+function deleteNpc(id){
+  state.npcs=state.npcs.filter(n=>n.id!==id);
+  // Quests store npcId as metadata (hook text is already a pre-built string).
+  // Null it anyway so saved data stays clean.
+  state.quests.forEach(q=>{ if(q.npcId===id) q.npcId=null; });
+  if(editingNpcId===id) editingNpcId=null;
+  renderRoster();
+  // No quest re-render needed: npcId is never resolved at display time.
+}
+
+function deleteOrg(id){
+  state.organisations=state.organisations.filter(o=>o.id!==id);
+  // Remove from every NPC's orgIds array
+  state.npcs.forEach(n=>{ n.orgIds=(n.orgIds||[]).filter(oid=>oid!==id); });
+  // Remove from the in-progress draft if one is open
+  if(draftNpc) draftNpc.orgIds=(draftNpc.orgIds||[]).filter(oid=>oid!==id);
+  if(editingOrgId===id) editingOrgId=null;
+  renderOrgs(); renderDraft(); renderRoster();
+}
+
+function deleteNation(id){
+  state.nations=state.nations.filter(n=>n.id!==id);
+  // Clear from every NPC that references this nation
+  state.npcs.forEach(n=>{ if(n.nationId===id) n.nationId=null; });
+  // Clear from the in-progress draft if one is open
+  if(draftNpc && draftNpc.nationId===id) draftNpc.nationId=null;
+  if(editingNationId===id) editingNationId=null;
+  renderNations(); renderDraft(); renderRoster();
+}
+
+/* ==========================================================
    VALIDATION PIPELINE — human-readable, never throws
    ========================================================== */
 
@@ -1590,7 +1642,7 @@ document.getElementById('btnStartNewGame').onclick=()=>{
   state.saveId='save_'+Math.random().toString(36).slice(2,10);
   state.maps=[firstMap]; state.activeMapId=firstMap.id;
   state.tension={value:td.startingValue,step:12,bleedTo:td.bleedTo,ceiling:td.ceiling,pending:[]};
-  state.npcs=[]; state.quests=[]; state.log=[];
+  state.npcs=[]; state.quests=[]; state.log=[]; state.journal='';
   state.organisations=deepClone(content.organisations||[]);
   state.nations=deepClone(content.nations||[]);
   state.provenance={settingTemplateId:content.templateId||'custom',settingTemplateVersion:content.templateVersion||1};
@@ -1638,6 +1690,7 @@ document.getElementById('fileLoadGame').addEventListener('change',async e=>{
   state.quests=data.quests||[];
   state.organisations=data.organisations||[];
   state.nations=data.nations||[];
+  state.journal=data.journal||'';
   state.log=(data.eventLog||[]).map(e=>({tag:e.tag,text:e.text,t:e.timestamp?Date.parse(e.timestamp):Date.now()}));
   state.provenance=data.provenance||{};
   SIZE=activeSnap().hexSize||30;
@@ -1656,7 +1709,7 @@ document.getElementById('btnSaveGame').onclick=()=>{
     activeMapId:state.activeMapId,
     maps:state.maps.map(m=>({id:m.id,templateId:m.templateId,templateVersion:m.templateVersion,templateSnapshot:m.templateSnapshot,hexes:[...m.hexes.values()],current:m.current})),
     tension:state.tension, npcs:state.npcs, quests:state.quests,
-    organisations:state.organisations, nations:state.nations,
+    organisations:state.organisations, nations:state.nations, journal:state.journal,
     eventLog:state.log.map(e=>({id:'evt_'+Math.random().toString(36).slice(2,9),timestamp:new Date(e.t).toISOString(),tag:e.tag,text:e.text}))
   };
   const name=(content.meta?.name||'save').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
@@ -1689,6 +1742,19 @@ document.getElementById('btnResetTension').onclick=()=>{ state.tension.value=ten
 document.getElementById('btnGenerateEvent').onclick=generateEvent;
 document.getElementById('btnGenNpc').onclick=rollNpc;
 document.getElementById('btnGenQuest').onclick=rollQuest;
+
+// Journal
+document.getElementById('btnOpenJournal').onclick=()=>{
+  document.getElementById('journalText').value=state.journal;
+  document.getElementById('journalDialog').showModal();
+};
+document.getElementById('btnSaveJournal').onclick=()=>{
+  state.journal=document.getElementById('journalText').value;
+  document.getElementById('journalDialog').close();
+};
+document.getElementById('btnCancelJournal').onclick=()=>{
+  document.getElementById('journalDialog').close();
+};
 document.getElementById('btnRoll').addEventListener('click', () => {
     const count = parseInt(document.getElementById('diceCount').value) || 1;
     const sides = parseInt(document.getElementById('diceSides').value) || 6;
@@ -1721,18 +1787,17 @@ document.getElementById('mapSwitcher').addEventListener('click',e=>{
   if(btn) switchToMap(btn.dataset.mapId);
 });
 
-// Hex detail — rename only (move is toolbar button)
+// Hex detail — rename and note save (move is toolbar button)
 document.getElementById('hexDetail').addEventListener('click',e=>{
   const btn=e.target.closest('[data-action]');
   if(!btn||!currentDetailHex) return;
   if(btn.dataset.action==='hex-rename'){
     const val=document.getElementById('hexRenameInput')?.value.trim();
     if(val){ currentDetailHex.name=val; renderMap(); showHexDetail(currentDetailHex); }
-  }
-  else if (btn.dataset.action === 'hex-save-note') {
-      const noteVal = document.getElementById('hexNoteInput')?.value.trim();
-      currentDetailHex.notes = noteVal || '';
-      showHexDetail(currentDetailHex); // re-render to update view state
+  } else if(btn.dataset.action==='hex-save-note'){
+    currentDetailHex.notes=document.getElementById('hexNoteInput')?.value||'';
+    btn.textContent='Saved \u2713';
+    setTimeout(()=>{ btn.textContent='Save Note'; }, 1400);
   }
 });
 
@@ -1757,7 +1822,7 @@ document.getElementById('npcRoster').addEventListener('click',e=>{
   const btn=e.target.closest('[data-action]'); if(!btn) return;
   const {action}=btn.dataset, id=btn.dataset.npcId;
   if(action==='npc-edit')           { editingNpcId=id; renderRoster(); }
-  else if(action==='npc-remove')    { state.npcs=state.npcs.filter(n=>n.id!==id); renderRoster(); }
+  else if(action==='npc-remove')    { deleteNpc(id); }
   else if(action==='npc-save-edit')   saveEditNpc(id);
   else if(action==='npc-cancel-edit'){ editingNpcId=null; renderRoster(); }
   else if(action==='edit-toggle-org'){
@@ -1810,7 +1875,7 @@ document.getElementById('orgList').addEventListener('click',e=>{
   const {action}=btn.dataset, eid=btn.dataset.entityId;
   if(action==='org-add')          { editingOrgId='new'; renderOrgs(); }
   else if(action==='org-edit')    { editingOrgId=eid; renderOrgs(); }
-  else if(action==='org-remove')  { state.organisations=state.organisations.filter(o=>o.id!==eid); editingOrgId=null; renderOrgs(); renderDraft(); renderRoster(); }
+  else if(action==='org-remove')  { deleteOrg(eid); }
   else if(action==='org-save')    { saveOrg(eid||null); }
   else if(action==='org-cancel')  { editingOrgId=null; renderOrgs(); }
 });
@@ -1821,7 +1886,7 @@ document.getElementById('nationList').addEventListener('click',e=>{
   const {action}=btn.dataset, eid=btn.dataset.entityId;
   if(action==='nation-add')         { editingNationId='new'; renderNations(); }
   else if(action==='nation-edit')   { editingNationId=eid; renderNations(); }
-  else if(action==='nation-remove') { state.nations=state.nations.filter(n=>n.id!==eid); editingNationId=null; renderNations(); renderDraft(); renderRoster(); }
+  else if(action==='nation-remove') { deleteNation(eid); }
   else if(action==='nation-save')   { saveNation(eid||null); }
   else if(action==='nation-cancel') { editingNationId=null; renderNations(); }
 });
