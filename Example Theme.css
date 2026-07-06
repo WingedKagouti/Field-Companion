@@ -1,0 +1,19 @@
+:root {
+  --ink: #00ffcc;
+  --ink-soft: 
+#00aa88;
+  --parchment: 
+#0f111a;
+  --parchment-deep: 
+#05070c;
+  --parchment-panel: 
+#171a26;
+  --rust: 
+#ff0055;
+  --line: 
+#00ffcc;
+}
+body {
+  background: 
+#0f111a !important; /* Disables the default radial-gradients */
+}

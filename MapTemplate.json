@@ -1,11 +1,11 @@
 {
-  "mapTemplateId": "hollow-reach-default",
+  "mapTemplateId": "reach-example",
   "mapTemplateVersion": 1,
   "schemaVersion": 1,
-  "settingTemplateId": "hollow-reach",
+  "settingTemplateId": "example-reach",
   "meta": {
-    "name": "The Hollow Reach",
-    "description": "The starting wilderness region."
+    "name": "The Example Reach",
+    "description": "A wilderness region."
   },
   "mode": "generated",
   "shape": "hex-radius",
@@ -19,53 +19,155 @@
   "tensionModifier": 1.0,
   "seed": null,
   "terrain": {
-    "plains": { "label": "Plains", "color": "#cfc596", "weight": 24, "icon": "plains" },
-    "forest": { "label": "Forest", "color": "#5b6b47", "weight": 22, "icon": "forest" },
-    "hills": { "label": "Hills", "color": "#b89a64", "weight": 15, "icon": "hills" },
-    "mountains": { "label": "Mountains", "color": "#7a6e63", "weight": 10, "icon": "mountains" },
-    "water": { "label": "Water", "color": "#3f6363", "weight": 11, "icon": "water" },
-    "swamp": { "label": "Swamp", "color": "#6a6b47", "weight": 8, "icon": "swamp" },
-    "ruins": { "label": "Ruins", "color": "#9c8b6b", "weight": 6, "icon": "ruins" },
-    "settlement": { "label": "Settlement", "color": "#a8763e", "weight": 4, "icon": "settlement" }
+    "plains": {
+      "label": "Plains",
+      "color": "#cfc596",
+      "weight": 24,
+      "icon": "plains"
+    },
+    "forest": {
+      "label": "Forest",
+      "color": "#5b6b47",
+      "weight": 22,
+      "icon": "forest"
+    },
+    "hills": {
+      "label": "Hills",
+      "color": "#b89a64",
+      "weight": 15,
+      "icon": "hills"
+    },
+    "mountains": {
+      "label": "Mountains",
+      "color": "#7a6e63",
+      "weight": 10,
+      "icon": "mountains"
+    },
+    "water": {
+      "label": "Water",
+      "color": "#3f6363",
+      "weight": 11,
+      "icon": "water"
+    },
+    "swamp": {
+      "label": "Swamp",
+      "color": "#6a6b47",
+      "weight": 8,
+      "icon": "swamp"
+    },
+    "ruins": {
+      "label": "Ruins",
+      "color": "#9c8b6b",
+      "weight": 6,
+      "icon": "ruins",
+      "namePool": "ruinNames"
+    },
+    "settlement": {
+      "label": "Settlement",
+      "color": "#a8763e",
+      "weight": 4,
+      "icon": "settlement",
+      "namePool": "settlementNames"
+    }
   },
   "encounterTables": {
     "generic": [
-      { "tag": "Quiet", "text": "The way is empty. Whatever happens here, you\u2019ll have to bring it yourself." },
-      { "tag": "Discovery", "text": "You spot signs of recent passage \u2014 footprints, a cold fire, a dropped item." },
-      { "tag": "Traveler", "text": "A figure approaches from a distance, alone." },
-      { "tag": "Resource", "text": "Something useful presents itself, if you\u2019re willing to take the time." }
+      {
+        "tag": "Quiet",
+        "text": "The way is empty. Whatever happens here, you’ll have to bring it yourself."
+      },
+      {
+        "tag": "Discovery",
+        "text": "You spot signs of recent passage — footprints, a cold fire, a dropped item."
+      },
+      {
+        "tag": "Traveler",
+        "text": "A figure approaches from a distance, alone."
+      },
+      {
+        "tag": "Resource",
+        "text": "Something useful presents itself, if you’re willing to take the time."
+      }
     ],
     "plains": [
-      { "tag": "Traveler", "text": "A trade caravan crosses your path, dust rising behind it." },
-      { "tag": "Sign", "text": "Crows circle something low in the grass ahead." }
+      {
+        "tag": "Traveler",
+        "text": "A trade caravan crosses your path, dust rising behind it."
+      },
+      {
+        "tag": "Sign",
+        "text": "Crows circle something low in the grass ahead."
+      }
     ],
     "forest": [
-      { "tag": "Sign", "text": "The canopy thins where something large has passed through recently." },
-      { "tag": "Hazard", "text": "The undergrowth conceals uneven, treacherous ground." }
+      {
+        "tag": "Sign",
+        "text": "The canopy thins where something large has passed through recently."
+      },
+      {
+        "tag": "Hazard",
+        "text": "The undergrowth conceals uneven, treacherous ground."
+      }
     ],
     "hills": [
-      { "tag": "Discovery", "text": "An old cairn marks this rise \u2014 someone wanted this place remembered." },
-      { "tag": "Sign", "text": "The wind carries a sound that doesn\u2019t belong out here." }
+      {
+        "tag": "Discovery",
+        "text": "An old cairn marks this rise — someone wanted this place remembered."
+      },
+      {
+        "tag": "Sign",
+        "text": "The wind carries a sound that doesn’t belong out here."
+      }
     ],
     "mountains": [
-      { "tag": "Hazard", "text": "Loose scree threatens the footing on the climb ahead." },
-      { "tag": "Discovery", "text": "A sheltered overhang shows signs of recent use." }
+      {
+        "tag": "Hazard",
+        "text": "Loose scree threatens the footing on the climb ahead."
+      },
+      {
+        "tag": "Discovery",
+        "text": "A sheltered overhang shows signs of recent use."
+      }
     ],
     "water": [
-      { "tag": "Sign", "text": "Something moves just beneath the surface." },
-      { "tag": "Resource", "text": "The water here runs clear and cold \u2014 worth filling your stores." }
+      {
+        "tag": "Sign",
+        "text": "Something moves just beneath the surface."
+      },
+      {
+        "tag": "Resource",
+        "text": "The water here runs clear and cold — worth filling your stores."
+      }
     ],
     "swamp": [
-      { "tag": "Hazard", "text": "The ground gives more than it should underfoot." },
-      { "tag": "Sign", "text": "A faint, sourceless light flickers between the reeds." }
+      {
+        "tag": "Hazard",
+        "text": "The ground gives more than it should underfoot."
+      },
+      {
+        "tag": "Sign",
+        "text": "A faint, sourceless light flickers between the reeds."
+      }
     ],
     "ruins": [
-      { "tag": "Discovery", "text": "Old stonework still bears marks worth puzzling over." },
-      { "tag": "Hazard", "text": "Part of the structure looks ready to give way." }
+      {
+        "tag": "Discovery",
+        "text": "Old stonework still bears marks worth puzzling over."
+      },
+      {
+        "tag": "Hazard",
+        "text": "Part of the structure looks ready to give way."
+      }
     ],
     "settlement": [
-      { "tag": "Traveler", "text": "Locals eye you with the particular curiosity reserved for outsiders." },
-      { "tag": "Discovery", "text": "Word of something \u2014 a rumour, a job, a warning \u2014 reaches you quickly here." }
+      {
+        "tag": "Traveler",
+        "text": "Locals eye you with the particular curiosity reserved for outsiders."
+      },
+      {
+        "tag": "Discovery",
+        "text": "Word of something — a rumour, a job, a warning — reaches you quickly here."
+      }
     ]
   },
   "authoredHexes": []
