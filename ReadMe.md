@@ -39,8 +39,8 @@ If you are on an older system and cannot update, Chrome 80+ (early 2020) or Fire
 
 | Version | Link |
 |---|---|
-| Latest stable release | [Download from GitHub Releases](https://github.com/YOUR_USERNAME/YOUR_REPO/releases/latest/download/Field%20Companion.html) |
-| Current development build | [View on GitHub](https://github.com/YOUR_USERNAME/YOUR_REPO/blob/main/Field%20Companion.html) (use the download button) |
+| Latest stable release | [Download from GitHub Releases](https://github.com/WingedKagouti/Field-Companion/releases/latest/download/Field%20Companion.html) |
+| Current development build | [View on GitHub](https://github.com/WingedKagouti/Field-Companion/blob/main/Field%20Companion.html) (use the download button) |
 
 ---
 
