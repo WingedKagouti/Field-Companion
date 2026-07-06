@@ -30,6 +30,7 @@
   .title-block .sub{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass-deep);}
   .header-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
   .header-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+  .header-meta{display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-wrap:wrap;}
   .setting-chip{font-family:'IBM Plex Mono',monospace;font-size:12px;border:1px solid var(--ink);background:var(--parchment-panel);padding:7px 12px;display:flex;align-items:center;gap:8px;color:var(--ink-soft);}
   .setting-chip b{color:var(--ink);font-weight:600;}
 
@@ -40,6 +41,13 @@
   .panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 16px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--parchment-panel),var(--parchment-deep));}
   .panel-head h2{font-family:'Fraunces',serif;font-size:16px;font-weight:600;margin:0;letter-spacing:.01em;}
   .panel-head .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--brass-deep);}
+  .panel-head .panel-head-right{display:flex;align-items:center;gap:8px;}
+  .collapse-btn{background:none;border:none;cursor:pointer;color:var(--ink-soft);font-size:14px;padding:2px 3px;line-height:1;transition:transform .18s ease;flex-shrink:0;}
+  .collapse-btn:hover{color:var(--ink);}
+  .panel.collapsed .collapse-btn{transform:rotate(-90deg);}
+  .panel.collapsed .panel-body{display:none;}
+  .panel.collapsed .tabs{display:none;}
+  .panel.collapsed .panel-head{border-bottom:none;}
   .panel-body{padding:16px;}
 
   /* Buttons */
@@ -207,12 +215,17 @@
         <button class="btn ghost small"   id="btnSaveGame">Save Game</button>
         <button class="btn ghost small"   id="btnOpenJournal">Journal</button>
       </div>
-      <div class="setting-chip">Setting: <b id="activeSettingLabel">The Hollow Reach</b></div>
+      <div class="header-meta">
+        <div class="setting-chip">Setting: <b id="activeSettingLabel">The Hollow Reach</b></div>
+        <button class="btn ghost small" id="btnLoadTheme">Load Theme</button>
+        <button class="btn ghost small" id="btnResetTheme">Reset Theme</button>
+      </div>
     </div>
   </header>
 
-  <input type="file" id="fileLoadGame" accept="application/json,.json" style="display:none;">
-  <input type="file" id="fileLoadMap"  accept="application/json,.json" style="display:none;">
+  <input type="file" id="fileLoadGame"  accept="application/json,.json" style="display:none;">
+  <input type="file" id="fileLoadMap"   accept="application/json,.json" style="display:none;">
+  <input type="file" id="fileLoadTheme" accept=".css,.txt" style="display:none;">
 
   <!-- JOURNAL DIALOG -->
   <dialog id="journalDialog" class="journal">
@@ -281,6 +294,8 @@
               </pattern>
             </defs>
             <g id="hexLayer"></g>
+            <g id="markerLayer" style="pointer-events:none;"></g>
+            <g id="markerLayer" style="pointer-events:none;"></g>
           </svg>
         </div>
         <div class="hex-detail" id="hexDetail">
@@ -296,7 +311,10 @@
       <section class="panel" style="margin-bottom:18px;">
         <div class="panel-head">
           <h2>Event / Encounter</h2>
-          <span class="eyebrow">Where complications surface</span>
+          <div class="panel-head-right">
+            <span class="eyebrow">Where complications surface</span>
+            <button class="collapse-btn" data-action="panel-collapse" title="Collapse">&#9660;</button>
+          </div>
         </div>
         <div class="panel-body">
           <button class="btn primary" id="btnGenerateEvent" style="width:100%;padding:13px;font-size:13px;">Generate Event / Encounter</button>
@@ -312,6 +330,12 @@
 
       <!-- NPCs / Quests / Orgs / Nations -->
       <section class="panel" style="margin-bottom:18px;">
+        <div class="panel-head">
+          <h2>Characters &amp; World</h2>
+          <div class="panel-head-right">
+            <button class="collapse-btn" data-action="panel-collapse" title="Collapse">&#9660;</button>
+          </div>
+        </div>
         <div class="tabs">
           <button class="tab-btn active" data-tab="npcs">NPCs</button>
           <button class="tab-btn" data-tab="quests">Quests</button>
@@ -349,7 +373,10 @@
       <section class="panel" style="margin-bottom:18px;">
         <div class="panel-head">
           <h2>Dice</h2>
-          <span class="eyebrow">Roll &amp; Result</span>
+          <div class="panel-head-right">
+            <span class="eyebrow">Roll &amp; Result</span>
+            <button class="collapse-btn" data-action="panel-collapse" title="Collapse">&#9660;</button>
+          </div>
         </div>
         <div class="panel-body">
           <div class="dice-row">
@@ -373,7 +400,10 @@
       <section class="panel">
         <div class="panel-head">
           <h2>Tension</h2>
-          <span class="eyebrow">Complication Clock</span>
+          <div class="panel-head-right">
+            <span class="eyebrow">Complication Clock</span>
+            <button class="collapse-btn" data-action="panel-collapse" title="Collapse">&#9660;</button>
+          </div>
         </div>
         <div class="panel-body">
           <div class="tension-row">
@@ -478,14 +508,14 @@ const DEFAULT_MAP_TEMPLATE = {
   tensionModifier:1.0,
   seed:null,
   terrain:{
-    plains:    { label:'Plains',    color:'#cfc596', weight:24, icon:'plains'     },
-    forest:    { label:'Forest',    color:'#5b6b47', weight:22, icon:'forest'     },
-    hills:     { label:'Hills',     color:'#b89a64', weight:15, icon:'hills'      },
-    mountains: { label:'Mountains', color:'#7a6e63', weight:10, icon:'mountains'  },
-    water:     { label:'Water',     color:'#3f6363', weight:11, icon:'water'      },
-    swamp:     { label:'Swamp',     color:'#6a6b47', weight:8,  icon:'swamp'      },
-    ruins:     { label:'Ruins',     color:'#9c8b6b', weight:6,  icon:'ruins'      },
-    settlement:{ label:'Settlement',color:'#a8763e', weight:4,  icon:'settlement' }
+    plains:    { label:'Plains',    color:'#cfc596', weight:24, icon:'plains'                          },
+    forest:    { label:'Forest',    color:'#5b6b47', weight:22, icon:'forest'                          },
+    hills:     { label:'Hills',     color:'#b89a64', weight:15, icon:'hills'                           },
+    mountains: { label:'Mountains', color:'#7a6e63', weight:10, icon:'mountains'                       },
+    water:     { label:'Water',     color:'#3f6363', weight:11, icon:'water'                           },
+    swamp:     { label:'Swamp',     color:'#6a6b47', weight:8,  icon:'swamp'                           },
+    ruins:     { label:'Ruins',     color:'#9c8b6b', weight:6,  icon:'ruins',      namePool:'ruinNames'       },
+    settlement:{ label:'Settlement',color:'#a8763e', weight:4,  icon:'settlement', namePool:'settlementNames' }
   },
   encounterTables:{
     generic:[
@@ -541,6 +571,7 @@ const state = {
   organisations: [],   // { id, name, description }
   nations: [],         // { id, name, description }
   journal: '',         // free-text player notes
+  theme:   { properties:{}, bodyBg:null }, // loaded CSS theme overrides
   log: [],
   provenance: { settingTemplateId: DEFAULT_SETTING_TEMPLATE.templateId, settingTemplateVersion: DEFAULT_SETTING_TEMPLATE.templateVersion }
 };
@@ -642,14 +673,18 @@ function switchToMap(id){
    Name pools come from the setting; terrain labels from the map.
    ========================================================== */
 function nameForHex(hex, snap){
-  const terrain = snap?.terrain || {};
   if(hex.q===0&&hex.r===0 && snap?.centerHex?.name) return snap.centerHex.name;
   const pools = content.namePools || {};
-  if(hex.terrain==='settlement' && pools.settlementNames?.length)
-    return pools.settlementNames[Math.floor(Math.random()*pools.settlementNames.length)];
-  if(hex.terrain==='ruins' && pools.ruinNames?.length)
-    return pools.ruinNames[Math.floor(Math.random()*pools.ruinNames.length)];
-  return `Hex ${hex.q},${hex.r} (${terrain[hex.terrain]?.label||hex.terrain})`;
+  // The terrain definition declares which name pool to draw from (if any).
+  // This decouples naming from terrain key strings — any terrain type in any
+  // template can opt into a named pool by setting namePool: "poolKey".
+  const terrainDef = snap?.terrain?.[hex.terrain];
+  if(terrainDef?.namePool && pools[terrainDef.namePool]?.length){
+    const pool = pools[terrainDef.namePool];
+    return pool[Math.floor(Math.random()*pool.length)];
+  }
+  // Fall back to the terrain label (coordinates shown in pickers, not names)
+  return terrainDef?.label || hex.terrain;
 }
 
 /* ==========================================================
@@ -751,6 +786,52 @@ function renderMap(){
     g.addEventListener('click',()=>showHexDetail(hex));
   }
   renderLegend();
+  renderMapMarkers();
+}
+
+/* Marker dot colors — one per content category, designed to
+   sit legibly on top of the earthy/natural terrain palette.   */
+const MARKER_COLORS = {
+  npc:   '#f9e08a',  // warm amber
+  quest: '#8adff0',  // light teal
+  notes: '#d8d8d8'   // neutral gray
+};
+
+function hexMarkerMarkup(hex, map, cx, cy){
+  const dots = [];
+  if(state.npcs.some(n=>n.location?.mapId===map.id&&n.location?.hexId===hex.id))
+    dots.push(MARKER_COLORS.npc);
+  if(state.quests.some(q=>q.location?.mapId===map.id&&q.location?.hexId===hex.id))
+    dots.push(MARKER_COLORS.quest);
+  if(hex.notes?.trim())
+    dots.push(MARKER_COLORS.notes);
+  if(!dots.length) return '';
+
+  const r       = Math.max(2.5, SIZE * 0.09);
+  const spacing = r * 2.8;
+  const totalW  = (dots.length - 1) * spacing;
+  const y       = cy + SIZE * 0.7;
+
+  return dots.map((fill, i) => {
+    const x = cx - totalW / 2 + i * spacing;
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="${fill}" stroke="rgba(0,0,0,0.25)" stroke-width="0.8"/>`;
+  }).join('');
+}
+
+/* Redraws only the marker layer — cheap enough to call whenever
+   NPC/quest/note data changes without a full map rebuild.       */
+function renderMapMarkers(){
+  const ml = document.getElementById('markerLayer');
+  if(!ml) return;
+  const map = activeMap();
+  if(!map){ ml.innerHTML=''; return; }
+  let html = '';
+  for(const hex of map.hexes.values()){
+    if(!hex.explored) continue;
+    const {x,y} = axialToPixel(hex.q, hex.r);
+    html += hexMarkerMarkup(hex, map, x, y);
+  }
+  ml.innerHTML = html;
 }
 
 function renderLegend(){
@@ -927,17 +1008,22 @@ let draftNpc=null, editingNpcId=null, editingOrgId=null, editingNationId=null, e
 function parseLocVal(v){ if(!v) return null; const [m,h]=v.split('|'); return m&&h?{mapId:m,hexId:h}:null; }
 function locVal(loc){ return loc?.mapId&&loc?.hexId?`${loc.mapId}|${loc.hexId}`:''; }
 
-function mapHexSelectOptions(selMapId,selHexId){
-  let opts=`<option value="">\u2014 none \u2014</option>`;
+function mapHexSelectOptions(selMapId, selHexId){
+  const curMap = activeMap();
+  const curQ   = curMap?.current?.q;
+  const curR   = curMap?.current?.r;
+  let opts = `<option value="">\u2014 none \u2014</option>`;
   for(const m of state.maps){
-    const hexes=[...m.hexes.values()].filter(h=>h.explored&&h.name);
+    const hexes = [...m.hexes.values()].filter(h => h.explored && h.name);
     if(!hexes.length) continue;
-    opts+=`<optgroup label="${escapeAttr(m.templateSnapshot?.meta?.name||m.id)}">`;
+    opts += `<optgroup label="${escapeAttr(m.templateSnapshot?.meta?.name||m.id)}">`;
     for(const h of hexes){
-      const sel=m.id===selMapId&&h.id===selHexId?'selected':'';
-      opts+=`<option value="${escapeAttr(m.id+'|'+h.id)}" ${sel}>${escapeHtml(h.name)}</option>`;
+      const sel       = m.id===selMapId && h.id===selHexId ? 'selected' : '';
+      const isCurrent = m.id===state.activeMapId && h.q===curQ && h.r===curR;
+      const label     = `${isCurrent?'\u2605 ':''}${h.name} (${h.q},${h.r})`;
+      opts += `<option value="${escapeAttr(m.id+'|'+h.id)}" ${sel}>${escapeHtml(label)}</option>`;
     }
-    opts+='</optgroup>';
+    opts += '</optgroup>';
   }
   return opts;
 }
@@ -1010,7 +1096,7 @@ function saveDraftNpc(){
   const url=document.getElementById('draftImageUrl').value.trim();
   if(url) draftNpc.imageRef={type:'url',value:url};
   state.npcs.unshift(draftNpc);
-  draftNpc=null; renderDraft(); renderRoster();
+  draftNpc=null; renderDraft(); renderRoster(); renderMapMarkers();
 }
 
 function renderRoster(){
@@ -1076,7 +1162,7 @@ function saveEditNpc(id){
   n.notes=document.getElementById('editNotes').value.trim();
   const url=document.getElementById('editImageUrl').value.trim();
   if(url) n.imageRef={type:'url',value:url};
-  editingNpcId=null; renderRoster();
+  editingNpcId=null; renderRoster(); renderMapMarkers();
 }
 
 /* ==========================================================
@@ -1172,7 +1258,7 @@ function saveQuestEdit(id){
   q.status=document.getElementById('questEditStatus').value;
   q.npcId=document.getElementById('questEditNpc').value||null;
   q.location=parseLocVal(document.getElementById('questEditLocation').value);
-  editingQuestId=null; renderQuests();
+  editingQuestId=null; renderQuests(); renderMapMarkers();
 }
 
 function saveNewQuest(){
@@ -1186,7 +1272,7 @@ function saveNewQuest(){
     npcId:document.getElementById('questEditNpc').value||null,
     location:parseLocVal(document.getElementById('questEditLocation').value)
   });
-  editingQuestId=null; renderQuests();
+  editingQuestId=null; renderQuests(); renderMapMarkers();
 }
 
 /* ==========================================================
@@ -1269,6 +1355,89 @@ function saveNation(entityId){
 }
 
 /* ==========================================================
+   THEME ENGINE
+   Loads a CSS file containing :root { } variable overrides
+   and an optional body { background: ... } rule.
+   Only the explicitly allowed set of CSS custom properties
+   is permitted — anything else rejects the whole file so that
+   a theme can never touch layout, typography, or JS behaviour.
+   ========================================================== */
+const THEME_ALLOWED_PROPS = new Set([
+  '--ink','--ink-soft',
+  '--parchment','--parchment-deep','--parchment-panel',
+  '--brass','--brass-deep',
+  '--rust','--moss','--teal','--gold','--line'
+]);
+
+function parseThemeFile(cssText){
+  const properties = {};
+  let bodyBg = null;
+  const errors = [];
+
+  // ── :root block ──────────────────────────────────────────
+  const rootMatch = cssText.match(/:root\s*\{([^}]*)\}/s);
+  if(rootMatch){
+    const block = rootMatch[1];
+    const re = /(--[\w-]+)\s*:\s*([^;]+);/g;
+    let m;
+    while((m = re.exec(block)) !== null){
+      const prop = m[1].trim();
+      const val  = m[2].trim();
+      if(THEME_ALLOWED_PROPS.has(prop)){
+        properties[prop] = val;
+      } else {
+        errors.push(`"${prop}" is not an allowed theme property.`);
+      }
+    }
+  }
+
+  // ── body block (background only) ─────────────────────────
+  const bodyMatch = cssText.match(/body\s*\{([^}]*)\}/s);
+  if(bodyMatch){
+    const block = bodyMatch[1];
+    // Strip comments before checking for unexpected props
+    const stripped = block.replace(/\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\//g, '').trim();
+    const bgMatch  = stripped.match(/background\s*:\s*([^;]+);/);
+    if(bgMatch){
+      bodyBg = bgMatch[1].trim().replace(/!important/i,'').trim();
+    }
+    // Flag any property in the body block that isn't background
+    const withoutBg = stripped.replace(/background\s*:[^;]+;/, '').trim();
+    if(withoutBg){
+      errors.push('The body block may only contain a "background" property.');
+    }
+  }
+
+  // Reject any text outside the two recognised blocks
+  const outside = cssText
+    .replace(/:root\s*\{[^}]*\}/s, '')
+    .replace(/body\s*\{[^}]*\}/s, '')
+    .replace(/\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\//g, '')
+    .trim();
+  if(outside){
+    errors.push('The theme file may only contain a :root { } block and an optional body { background: } rule. Unexpected content was found.');
+  }
+
+  return { properties, bodyBg, errors };
+}
+
+function applyTheme({ properties={}, bodyBg=null }={}){
+  for(const [prop, val] of Object.entries(properties)){
+    document.documentElement.style.setProperty(prop, val);
+  }
+  if(bodyBg !== null){
+    document.body.style.background = bodyBg;
+  }
+}
+
+function resetTheme(){
+  for(const prop of THEME_ALLOWED_PROPS){
+    document.documentElement.style.removeProperty(prop);
+  }
+  document.body.style.background = '';
+}
+
+/* ==========================================================
    DELETION HELPERS
    Each one cleans up downstream references before re-rendering,
    so no orphaned IDs are left in saved data.
@@ -1279,7 +1448,7 @@ function deleteNpc(id){
   // Null it anyway so saved data stays clean.
   state.quests.forEach(q=>{ if(q.npcId===id) q.npcId=null; });
   if(editingNpcId===id) editingNpcId=null;
-  renderRoster();
+  renderRoster(); renderMapMarkers();
   // No quest re-render needed: npcId is never resolved at display time.
 }
 
@@ -1373,6 +1542,7 @@ function checkTerrainEntries(terrain){
       { field:'icon',     check:'string', optional:true, msg:`terrain.${k}.icon must be a string (built-in shape name).` },
       { field:'iconUrl',  check:'string', optional:true, msg:`terrain.${k}.iconUrl must be a string URL.`               },
       { field:'iconColor',check:'string', optional:true, msg:`terrain.${k}.iconColor must be a CSS colour string (e.g. "#3f4a30").` },
+      { field:'namePool', check:'string', optional:true, msg:`terrain.${k}.namePool must be a string matching a key in the setting's namePools (e.g. "settlementNames").` },
     ]));
   }
   return errors;
@@ -1714,6 +1884,7 @@ document.getElementById('btnStartNewGame').onclick=()=>{
   state.tension={value:td.startingValue,step:12,bleedTo:td.bleedTo,ceiling:td.ceiling,pending:[]};
   editingNpcId=null; editingOrgId=null; editingNationId=null; editingQuestId=null;
   state.npcs=[]; state.quests=[]; state.log=[]; state.journal='';
+  state.theme={ properties:{}, bodyBg:null }; resetTheme();
   state.organisations=deepClone(content.organisations||[]);
   state.nations=deepClone(content.nations||[]);
   state.provenance={settingTemplateId:content.templateId||'custom',settingTemplateVersion:content.templateVersion||1};
@@ -1762,6 +1933,8 @@ document.getElementById('fileLoadGame').addEventListener('change',async e=>{
   state.organisations=data.organisations||[];
   state.nations=data.nations||[];
   state.journal=data.journal||'';
+  state.theme=data.theme||{properties:{},bodyBg:null};
+  resetTheme(); applyTheme(state.theme);
   state.log=(data.eventLog||[]).map(e=>({tag:e.tag,text:e.text,t:e.timestamp?Date.parse(e.timestamp):Date.now()}));
   state.provenance=data.provenance||{};
   SIZE=activeSnap().hexSize||30;
@@ -1780,7 +1953,7 @@ document.getElementById('btnSaveGame').onclick=()=>{
     activeMapId:state.activeMapId,
     maps:state.maps.map(m=>({id:m.id,templateId:m.templateId,templateVersion:m.templateVersion,templateSnapshot:m.templateSnapshot,hexes:[...m.hexes.values()],current:m.current})),
     tension:state.tension, npcs:state.npcs, quests:state.quests,
-    organisations:state.organisations, nations:state.nations, journal:state.journal,
+    organisations:state.organisations, nations:state.nations, journal:state.journal, theme:state.theme,
     eventLog:state.log.map(e=>({id:'evt_'+Math.random().toString(36).slice(2,9),timestamp:new Date(e.t).toISOString(),tag:e.tag,text:e.text}))
   };
   const name=(content.meta?.name||'save').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
@@ -1826,6 +1999,28 @@ document.getElementById('btnSaveJournal').onclick=()=>{
 document.getElementById('btnCancelJournal').onclick=()=>{
   document.getElementById('journalDialog').close();
 };
+
+// Load Theme
+document.getElementById('btnLoadTheme').onclick=()=>document.getElementById('fileLoadTheme').click();
+document.getElementById('fileLoadTheme').addEventListener('change', async e=>{
+  const file=e.target.files[0]; e.target.value=''; if(!file) return;
+  const text=await file.text();
+  const {properties,bodyBg,errors}=parseThemeFile(text);
+  if(errors.length){
+    showError(`"${file.name}" couldn\u2019t be applied as a theme`, errors);
+    return;
+  }
+  hideError();
+  state.theme={properties,bodyBg};
+  resetTheme();
+  applyTheme(state.theme);
+});
+
+// Reset Theme
+document.getElementById('btnResetTheme').onclick=()=>{
+  state.theme={properties:{},bodyBg:null};
+  resetTheme();
+};
 document.getElementById('btnRoll').addEventListener('click', () => {
     const count = parseInt(document.getElementById('diceCount').value) || 1;
     const sides = parseInt(document.getElementById('diceSides').value) || 6;
@@ -1870,6 +2065,7 @@ document.getElementById('hexDetail').addEventListener('click',e=>{
     if(val){ currentDetailHex.terrain=val; renderMap(); showHexDetail(currentDetailHex); }
   } else if(btn.dataset.action==='hex-save-note'){
     currentDetailHex.notes=document.getElementById('hexNoteInput')?.value||'';
+    renderMapMarkers();
     btn.textContent='Saved \u2713';
     setTimeout(()=>{ btn.textContent='Save Note'; }, 1400);
   }
@@ -1940,7 +2136,7 @@ document.getElementById('questList').addEventListener('click',e=>{
   const btn=e.target.closest('[data-action]'); if(!btn) return;
   const {action}=btn.dataset, qid=btn.dataset.questId;
   if(action==='quest-status')      { const q=state.quests.find(q=>q.id===qid); if(q) q.status=btn.dataset.status; renderQuests(); }
-  else if(action==='quest-remove') { state.quests=state.quests.filter(q=>q.id!==qid); renderQuests(); }
+  else if(action==='quest-remove') { state.quests=state.quests.filter(q=>q.id!==qid); renderQuests(); renderMapMarkers(); }
   else if(action==='quest-edit')   { editingQuestId=qid; renderQuests(); }
   else if(action==='quest-save-edit')  { saveQuestEdit(qid); }
   else if(action==='quest-save-new')   { saveNewQuest(); }
@@ -1969,6 +2165,13 @@ document.getElementById('nationList').addEventListener('click',e=>{
   else if(action==='nation-remove') { deleteNation(eid); }
   else if(action==='nation-save')   { saveNation(eid||null); }
   else if(action==='nation-cancel') { editingNationId=null; renderNations(); }
+});
+
+// Panel collapse — single delegated listener covers all four collapsible panels
+document.addEventListener('click', e=>{
+  const btn=e.target.closest('[data-action="panel-collapse"]');
+  if(!btn) return;
+  btn.closest('.panel').classList.toggle('collapsed');
 });
 
 // Tab switching — scoped to the single .tabs container so it doesn't
