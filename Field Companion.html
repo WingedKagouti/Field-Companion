@@ -191,6 +191,13 @@
   ::-webkit-scrollbar-thumb{background:var(--brass);}
   ::-webkit-scrollbar-track{background:var(--parchment-deep);}
 </style>
+<!--
+  Dedicated stylesheet for loaded themes. The theme loader only ever
+  rewrites this single element's textContent — the base stylesheet
+  above (layout, typography, component structure) is never touched,
+  so an imported theme can change colours but cannot break geometry.
+-->
+<style id="dynamicThemeOverrides"></style>
 </head>
 <body>
 <div class="app">
@@ -294,7 +301,6 @@
               </pattern>
             </defs>
             <g id="hexLayer"></g>
-            <g id="markerLayer" style="pointer-events:none;"></g>
             <g id="markerLayer" style="pointer-events:none;"></g>
           </svg>
         </div>
@@ -554,7 +560,7 @@ const EMPTY_EVENT_RESULT = '<div class="empty-state">Generate an event to see wh
 
 let currentDetailHex = null;  // which hex is shown in detail panel
 
-function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+function deepClone(o){ return structuredClone(o); }
 
 /* ==========================================================
    STATE  (schema v2 — maps array, tension object)
@@ -783,7 +789,6 @@ function renderMap(){
       star.innerHTML=`<text x="${x}" y="${y+6}" text-anchor="middle" font-size="20" fill="#9c3b2e">\u2605</text>`;
       hexLayer.appendChild(g); hexLayer.appendChild(star);
     } else { hexLayer.appendChild(g); }
-    g.addEventListener('click',()=>showHexDetail(hex));
   }
   renderLegend();
   renderMapMarkers();
@@ -1422,19 +1427,17 @@ function parseThemeFile(cssText){
 }
 
 function applyTheme({ properties={}, bodyBg=null }={}){
-  for(const [prop, val] of Object.entries(properties)){
-    document.documentElement.style.setProperty(prop, val);
-  }
-  if(bodyBg !== null){
-    document.body.style.background = bodyBg;
-  }
+  const styleEl = document.getElementById('dynamicThemeOverrides');
+  const rootDecls = Object.entries(properties)
+    .map(([prop, val]) => `  ${prop}: ${val};`)
+    .join('\n');
+  const rootBlock = rootDecls ? `:root {\n${rootDecls}\n}` : '';
+  const bodyBlock = bodyBg !== null ? `body {\n  background: ${bodyBg} !important;\n}` : '';
+  styleEl.textContent = [rootBlock, bodyBlock].filter(Boolean).join('\n');
 }
 
 function resetTheme(){
-  for(const prop of THEME_ALLOWED_PROPS){
-    document.documentElement.style.removeProperty(prop);
-  }
-  document.body.style.background = '';
+  document.getElementById('dynamicThemeOverrides').textContent = '';
 }
 
 /* ==========================================================
@@ -2165,6 +2168,15 @@ document.getElementById('nationList').addEventListener('click',e=>{
   else if(action==='nation-remove') { deleteNation(eid); }
   else if(action==='nation-save')   { saveNation(eid||null); }
   else if(action==='nation-cancel') { editingNationId=null; renderNations(); }
+});
+
+// Hex map — single delegated listener replaces per-polygon binding in renderMap
+document.getElementById('hexmap').addEventListener('click', e=>{
+  const g = e.target.closest('.hex');
+  if(!g) return;
+  const map = activeMap();
+  const hex = map?.hexes.get(g.dataset.key);
+  if(hex) showHexDetail(hex);
 });
 
 // Panel collapse — single delegated listener covers all four collapsible panels
